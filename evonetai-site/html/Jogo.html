@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EvoNetAI • Jogo de Diagnóstico de Problemas</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+  /* ======= RESET ======= */
+  *,*::before,*::after{box-sizing:border-box}html,body{margin:0;padding:0}
+  :root{
+    --bg:#0d1117; --panel:#161b22; --border:#30363d; --muted:#8b949e; --text:#e6edf3;
+    --blue:#58a6ff; --green:#2ea043; --red:#f85149; --yellow:#d29922; --cyan:#39c5cf;
+    --shadow:0 8px 24px rgba(0,0,0,.35);
+  }
+  body{background:var(--bg); color:var(--text); font-family: ui-sans-serif,system-ui,"Segoe UI",Roboto,Arial; min-height:100vh; display:flex; flex-direction:column}
+
+  /* ======= NAVBAR (fornecida) ======= */
+  .header{position:sticky; top:0; z-index:1000; background:var(--panel); border-bottom:1px solid var(--border)}
+  .navbar{max-width:1200px; margin:auto; display:flex; align-items:center; justify-content:space-between; padding:14px 18px}
+  .nav-logo{font-weight:800; color:var(--blue); text-decoration:none}
+  .nav-logo span{color:var(--green)}
+  .nav-menu{list-style:none; display:flex; gap:14px}
+  .nav-link{color:var(--text); text-decoration:none; padding:6px 10px; border-radius:8px; border:1px solid transparent}
+  .nav-link:hover{border-color:var(--border); background:#0f141a}
+  .hamburger{display:none; color:var(--text); cursor:pointer}
+  @media (max-width:980px){
+    .hamburger{display:block}
+    .nav-menu{display:none; position:absolute; left:0; right:0; top:60px; background:var(--panel); border-top:1px solid var(--border); padding:12px; flex-direction:column}
+    .nav-menu.active{display:flex}
+  }
+
+  /* ======= HUD SUPERIOR ======= */
+  .hud{max-width:1200px; width:100%; margin:18px auto 0; padding:0 18px; display:grid; grid-template-columns:1fr auto auto auto; gap:10px; align-items:center}
+  .hud .badge{background:var(--panel); border:1px solid var(--border); padding:10px 12px; border-radius:10px; box-shadow:var(--shadow); font-weight:600}
+  .bar{height:10px; width:100%; background:var(--panel); border:1px solid var(--border); border-radius:999px; overflow:hidden}
+  .bar>span{display:block; height:100%; width:0; background:linear-gradient(90deg,var(--blue),var(--green)); transition:width .4s ease}
+  .controls{display:flex; gap:10px}
+  .btn{background:var(--blue); color:#fff; border:none; padding:10px 14px; border-radius:10px; cursor:pointer}
+  .btn:disabled{opacity:.6; cursor:not-allowed}
+  .btn.secondary{background:#222b36; border:1px solid var(--border)}
+  .btn.warn{background:var(--yellow); color:#111}
+  .btn.danger{background:var(--red)}
+  .muted{color:var(--muted)}
+
+  /* ======= DESKTOP ======= */
+  .desktop{position:relative; flex:1; max-width:1200px; width:100%; margin:16px auto; padding:18px; display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:18px}
+  .icon{background:var(--panel); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); padding:16px; text-align:center; cursor:pointer; transition:transform .1s ease, border-color .15s}
+  .icon:hover{transform:translateY(-2px); border-color:#425166}
+  .icon i{font-size:28px; color:var(--cyan)}
+  .icon span{display:block; margin-top:8px; font-weight:600}
+
+  /* ======= SCENARIO CARD ======= */
+  .scenario-card{grid-column:1/-1; background:var(--panel); border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow); padding:18px}
+  .scenario-title{font-size:18px; font-weight:800; color:var(--blue)}
+  .scenario-text{margin-top:6px; color:var(--text)}
+  .hints{margin-top:10px; color:var(--muted); font-size:14px}
+
+  /* ======= WINDOWS ======= */
+  .window{position:fixed; left:50%; top:54%; transform:translate(-50%,-50%); width:min(720px,92vw); background:#0b0f14; border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); display:none; z-index:1200}
+  .window.show{display:block; animation:pop .2s ease}
+  @keyframes pop{from{transform:translate(-50%,-48%) scale(.98); opacity:.8}to{transform:translate(-50%,-50%) scale(1); opacity:1}}
+  .win-head{display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-bottom:1px solid var(--border); background:#0f141a; border-radius:14px 14px 0 0; cursor:move}
+  .win-title{font-weight:800}
+  .win-actions{display:flex; gap:8px}
+  .circle{width:10px;height:10px;border-radius:50%}
+  .c-red{background:#ff5f56}.c-yellow{background:#ffbd2e}.c-green{background:#27c93f}
+  .win-body{padding:14px}
+  .terminal{background:#000; color:#d1d1d1; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; border-radius:10px; padding:12px; height:280px; overflow:auto; border:1px solid #222}
+  .term-input{display:flex; gap:8px; margin-top:10px}
+  .term-input input{flex:1; background:#0b0b0b; color:#fff; border:1px solid #222; border-radius:8px; padding:10px}
+  .term-input button{background:var(--green); color:#fff; border:none; border-radius:8px; padding:10px 14px; cursor:pointer}
+
+  .grid{display:grid; gap:12px}
+  .grid.two{grid-template-columns:1fr 1fr}
+  .panel{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:12px}
+  .label{font-size:13px; color:var(--muted)}
+  .value{font-weight:700}
+
+  .toast{position:fixed; right:16px; bottom:16px; background:var(--panel); border:1px solid var(--border); border-left:4px solid var(--blue); padding:12px 14px; border-radius:12px; box-shadow:var(--shadow); z-index:3000; display:none}
+  .toast.show{display:block; animation:fade .2s ease}
+  @keyframes fade{from{opacity:0; transform:translateY(6px)}to{opacity:1; transform:translateY(0)}}
+
+  .footer{max-width:1200px; width:100%; margin:0 auto 18px; padding:0 18px; display:flex; justify-content:space-between; color:var(--muted); font-size:12px}
+</style>
+</head>
+<body>
+  <!-- ===== NAVBAR ===== -->
+  <header class="header"> 
+    <nav class="navbar">
+      <a href="index.html" class="nav-logo">EvoNet<span>AI</span></a>
+      <ul class="nav-menu">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="servicos.html" class="nav-link">Serviços</a></li>
+        <li><a href="projeto-de-rede.html" class="nav-link">Projetos</a></li>
+        <li><a href="mvp.html" class="nav-link">MVP</a></li>
+        <li><a href="plataforma.html" class="nav-link">Plataforma</a></li>
+        <li><a href="suporte-conformidade.html" class="nav-link">Suporte</a></li>
+        <li><a href="tecnologia.html" class="nav-link">Tecnologia</a></li>
+        <li><a href="contato.html" class="nav-link">Contato</a></li>
+        <li><a href="dominio.html" class="nav-link">Domínio</a></li>
+        <li><a href="Jogo.html" class="nav-link">Jogo</a></li>
+        <li><a href="login.html" class="nav-link">Login</a></li>
+        <li><a href="cadastro.html" class="nav-link">Cadastro</a></li>
+        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+      </ul>
+      <div class="hamburger" onclick="document.querySelector('.nav-menu').classList.toggle('active')">
+        <i class="fas fa-bars"></i>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== HUD ===== -->
+  <div class="hud">
+    <div class="badge"><i class="fa-solid fa-bullseye"></i> Cenário <span id="hudScenario">1</span>/<span id="hudTotal">?</span></div>
+    <div class="badge"><i class="fa-regular fa-clock"></i> Tempo: <span id="hudTime">120</span>s</div>
+    <div class="badge"><i class="fa-solid fa-star"></i> Pontos: <span id="hudScore">0</span></div>
+    <div class="controls">
+      <button class="btn secondary" id="btnHint"><i class="fa-regular fa-lightbulb"></i> Dica (-10s)</button>
+      <button class="btn warn" id="btnDiag"><i class="fa-solid fa-stethoscope"></i> Auto-diagnóstico (-5s)</button>
+      <button class="btn secondary" id="btnMute"><i class="fa-solid fa-volume-high"></i></button>
+      <button class="btn" id="btnNext" disabled>Próximo ➜</button>
+    </div>
+    <div class="bar" style="grid-column:1/-1"><span id="hudProgress"></span></div>
+  </div>
+
+  <!-- ===== DESKTOP ===== -->
+  <main class="desktop" id="desktop">
+    <div class="scenario-card">
+      <div class="scenario-title" id="scTitle">Carregando…</div>
+      <div class="scenario-text" id="scText"></div>
+      <div class="hints" id="scHint"></div>
+    </div>
+
+    <!-- Apps / Ferramentas -->
+    <div class="icon" data-open="winTerminal"><i class="fa-solid fa-terminal"></i><span>Terminal</span></div>
+    <div class="icon" data-open="winNet"><i class="fa-solid fa-ethernet"></i><span>Rede</span></div>
+    <div class="icon" data-open="winFirewall"><i class="fa-solid fa-shield-halved"></i><span>Firewall</span></div>
+    <div class="icon" data-open="winDNS"><i class="fa-solid fa-globe"></i><span>DNS</span></div>
+    <div class="icon" data-open="winRouter"><i class="fa-solid fa-router"></i><span>Roteador</span></div>
+    <div class="icon" data-open="winCable"><i class="fa-solid fa-plug-circle-xmark"></i><span>Cabo</span></div>
+    <div class="icon" data-open="winNotebook"><i class="fa-solid fa-laptop"></i><span>Notebook</span></div>
+  </main>
+
+  <!-- ===== WINDOWS ===== -->
+  <!-- Terminal -->
+  <section id="winTerminal" class="window">
+    <div class="win-head"><div class="win-title"><i class="fa-solid fa-terminal"></i> Terminal</div>
+      <div class="win-actions"><span class="circle c-red" data-close="winTerminal"></span><span class="circle c-yellow"></span><span class="circle c-green"></span></div>
+    </div>
+    <div class="win-body">
+      <div id="terminalOut" class="terminal">EvoShell v1.0 — digite <b>help</b> para ver comandos.</div>
+      <div class="term-input">
+        <input id="terminalIn" placeholder="ex.: ping google.com / ipconfig / tracert site.com / nslookup site.com" />
+        <button onclick="runCommand()">Executar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rede -->
+  <section id="winNet" class="window">
+    <div class="win-head"><div class="win-title"><i class="fa-solid fa-ethernet"></i> Configuração de Rede</div>
+      <div class="win-actions"><span class="circle c-red" data-close="winNet"></span><span class="circle c-yellow"></span><span class="circle c-green"></span></div>
+    </div>
+    <div class="win-body grid two">
+      <div class="panel">
+        <div class="label">Endereço IPv4</div>
+        <div class="value" id="ipAddr">0.0.0.0</div>
+        <div class="label" style="margin-top:8px">Gateway</div>
+        <div class="value" id="gwAddr">0.0.0.0</div>
+        <div class="label" style="margin-top:8px">Status NIC</div>
+        <div class="value" id="nicStatus">Desconectado</div>
+      </div>
+      <div class="panel">
+        <button class="btn" onclick="actionSetIP()">Obter IP válido</button>
+        <button class="btn" onclick="actionReleaseRenew()">Release/Renew DHCP</button>
+        <button class="btn secondary" onclick="actionToggleNIC()">Ativar/Desativar NIC</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Firewall -->
+  <section id="winFirewall" class="window">
+    <div class="win-head"><div class="win-title"><i class="fa-solid fa-shield-halved"></i> Firewall</div>
+      <div class="win-actions"><span class="circle c-red" data-close="winFirewall"></span><span class="circle c-yellow"></span><span class="circle c-green"></span></div>
+    </div>
+    <div class="win-body grid two">
+      <div class="panel">
+        <div class="label">Estado</div>
+        <div class="value" id="fwState">Ativo</div>
+        <div class="label" style="margin-top:8px">Regras</div>
+        <div class="value" id="fwRule">Bloqueia HTTP/HTTPS</div>
+      </div>
+      <div class="panel">
+        <button class="btn" onclick="actionAllowWeb()">Permitir Web (80/443)</button>
+        <button class="btn secondary" onclick="actionToggleFW()">Ativar/Desativar Firewall</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- DNS -->
+  <section id="winDNS" class="window">
+    <div class="win-head"><div class="win-title"><i class="fa-solid fa-globe"></i> DNS</div>
+      <div class="win-actions"><span class="circle c-red" data-close="winDNS"></span><span class="circle c-yellow"></span><span class="circle c-green"></span></div>
+    </div>
+    <div class="win-body grid two">
+      <div class="panel">
+        <div class="label">Servidor DNS</div>
+        <div class="value" id="dnsAddr">0.0.0.0</div>
+      </div>
+      <div class="panel">
+        <button class="btn" onclick="actionSetDNS('8.8.8.8')">Usar 8.8.8.8</button>
+        <button class="btn" onclick="actionSetDNS('1.1.1.1')">Usar 1.1.1.1</button>
+        <button class="btn secondary" onclick="actionFlushDNS()">Limpar cache DNS</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Roteador -->
+  <section id="winRouter" class="window">
+    <div class="win-head"><div class="win-title"><i class="fa-solid fa-router"></i> Roteador</div>
+      <div class="win-actions"><span class="circle c-red" data-close="winRouter"></span><span class="circle c-yellow"></span><span class="circle c-green"></span></div>
+    </div>
+    <div class="win-body grid two">
+      <div class="panel">
+        <div class="label">Status WAN</div>
+        <div class="value" id="wanStatus">Offline</div>
+        <div class="label" style="margin-top:8px">Perda de Pacotes</div>
+        <div class="value" id="loss">100%</div>
+      </div>
+      <div class="panel">
+        <button class="btn" onclick="actionRestartRouter()">Reiniciar Roteador</button>
+        <button class="btn secondary" onclick="actionCheckISP()">Verificar ISP</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cabo -->
+  <section id="winCable" class="window">
+    <div class="win-head"><div class="win-title"><i class="fa-solid fa-plug-circle-xmark"></i> Cabo / Porta</div>
+      <div class="win-actions"><span class="circle c-red" data-close="winCable"></span><span class="circle c-yellow"></span><span class="circle c-green"></span></div>
+    </div>
+    <div class="win-body grid two">
+      <div class="panel">
+        <div class="label">Link</div>
+        <div class="value" id="linkState">Desconectado</div>
+        <div class="label" style="margin-top:8px">Velocidade</div>
+        <div class="value" id="speedState">—</div>
+      </div>
+      <div class="panel">
+        <button class="btn" onclick="actionPlugCable()">Conectar Cabo</button>
+        <button class="btn secondary" onclick="actionSwapPort()">Trocar Porta</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Notebook (apenas flavor visual + toggle Wi-Fi) -->
+  <section id="winNotebook" class="window">
+    <div class="win-head"><div class="win-title"><i class="fa-solid fa-laptop"></i> Dispositivo</div>
+      <div class="win-actions"><span class="circle c-red" data-close="winNotebook"></span><span class="circle c-yellow"></span><span class="circle c-green"></span></div>
+    </div>
+    <div class="win-body grid two">
+      <div class="panel">
+        <div class="label">Wi-Fi</div>
+        <div class="value" id="wifiState">Desligado</div>
+      </div>
+      <div class="panel">
+        <button class="btn" onclick="actionToggleWifi()">Ligar/Desligar Wi-Fi</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div>© EvoNetAI • Simulador de Troubleshooting</div>
+    <div id="leader">Leaderboard local: <span id="leaders"></span></div>
+  </div>
+
+<script>
+/* ========= ÁUDIO (beeps) ========= */
+let mute = false;
+function beep(freq=660, ms=90, type='square'){
+  if(mute) return;
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const o = ctx.createOscillator(); const g = ctx.createGain();
+    o.type=type; o.frequency.value=freq; o.connect(g); g.connect(ctx.destination);
+    o.start(); g.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + ms/1000);
+    setTimeout(()=>{o.stop(); ctx.close()}, ms+40);
+  }catch(e){}
+}
+
+/* ========= ESTADO DO JOGO ========= */
+const scenarios = [
+  {
+    id:1,
+    title:"Sem internet — Cabo desconectado",
+    text:"O usuário relata que nenhum site abre. O ícone de rede mostra X vermelho. Você está no posto de suporte.",
+    hint:"Verifique a conexão física (cabo/porta) antes de comandos de rede.",
+    timer:120,
+    model:{ link:false, nic:false, ip:false, dns:false, firewallBlock:false, routerOnline:true },
+    goal: (m)=> m.link && m.nic && m.ip
+  },
+  {
+    id:2,
+    title:"IP inválido — Conflito com Gateway",
+    text:"O PC recebeu IP 169.254.x.x (APIPA). O roteador está online.",
+    hint:"Renove DHCP e confirme gateway. Pings ao gateway devem responder.",
+    timer:120,
+    model:{ link:true, nic:true, ip:false, dns:true, firewallBlock:false, routerOnline:true },
+    goal: (m)=> m.ip
+  },
+  {
+    id:3,
+    title:"Bloqueio de Firewall",
+    text:"Apenas ping responde, mas sites HTTP/HTTPS não abrem.",
+    hint:"Regra do firewall pode estar bloqueando portas 80/443.",
+    timer:120,
+    model:{ link:true, nic:true, ip:true, dns:true, firewallBlock:true, routerOnline:true },
+    goal: (m)=> !m.firewallBlock
+  },
+  {
+    id:4,
+    title:"Problema de DNS intermitente",
+    text:"Alguns sites abrem via IP, mas nomes de domínio falham.",
+    hint:"Teste nslookup; trocar DNS costuma resolver.",
+    timer:130,
+    model:{ link:true, nic:true, ip:true, dns:false, firewallBlock:false, routerOnline:true },
+    goal: (m)=> m.dns
+  },
+  {
+    id:5,
+    title:"Roteador com WAN offline",
+    text:"Vários PCs sem acesso externo. Rede local funciona.",
+    hint:"Reinicie o roteador e valide com traceroute/ping externo.",
+    timer:140,
+    model:{ link:true, nic:true, ip:true, dns:true, firewallBlock:false, routerOnline:false },
+    goal: (m)=> m.routerOnline
+  }
+];
+
+let S = { i:0, time:0, score:0, model:{} };
+
+/* ========= UI HELPERS ========= */
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+function toast(msg, color='var(--blue)'){
+  const t = $('#toast'); t.innerHTML = msg; t.style.borderLeftColor = color; t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 2000);
+}
+
+function updateHUD(){
+  $('#hudScenario').textContent = S.i+1;
+  $('#hudTotal').textContent = scenarios.length;
+  $('#hudScore').textContent = S.score;
+  $('#hudTime').textContent = S.time;
+  $('#hudProgress').style.width = ((S.i)/scenarios.length)*100 + '%';
+}
+
+function renderScenario(){
+  const sc = scenarios[S.i];
+  $('#scTitle').textContent = sc.title;
+  $('#scText').textContent = sc.text;
+  $('#scHint').textContent = '💡 Dica rápida: ' + sc.hint;
+}
+
+function openWin(id){
+  const w = document.getElementById(id);
+  w.classList.add('show'); bringToFront(w);
+}
+function closeWin(id){ document.getElementById(id).classList.remove('show'); }
+
+function bringToFront(el){
+  let maxZ = 1200;
+  $$('.window').forEach(w => { const z = +getComputedStyle(w).zIndex; if(z>maxZ) maxZ=z; });
+  el.style.zIndex = maxZ + 1;
+}
+
+/* ========= DRAG WINDOWS ========= */
+$$('.window').forEach(win=>{
+  const head = win.querySelector('.win-head');
+  let dx=0, dy=0, dragging=false;
+  head.addEventListener('mousedown', (e)=>{dragging=true; bringToFront(win); dx=e.clientX - win.offsetLeft; dy=e.clientY - win.offsetTop;});
+  window.addEventListener('mousemove', (e)=>{ if(!dragging) return; win.style.left = e.clientX - dx + 'px'; win.style.top = e.clientY - dy + 'px'; win.style.transform='translate(0,0)';});
+  window.addEventListener('mouseup', ()=> dragging=false);
+});
+
+/* ========= ICONS OPEN/CLOSE ========= */
+$$('.icon').forEach(ic => ic.addEventListener('click', () => openWin(ic.dataset.open)));
+
+// Fechar todas as janelas usando o atributo data-close
+$$('[data-close]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = btn.getAttribute('data-close');
+    closeWin(target);
+  });
+});
+
+/* ========= TIMER ========= */
+let timerInt=null;
+function startTimer(){
+  clearInterval(timerInt);
+  timerInt = setInterval(()=>{
+    S.time--; if(S.time<0){ S.time=0; clearInterval(timerInt); failScenario("⏱ Tempo esgotado."); return; }
+    updateHUD();
+  }, 1000);
+}
+
+/* ========= TERMINAL ========= */
+const termOut = $('#terminalOut');
+const termIn  = $('#terminalIn');
+
+const helpText = `Comandos:
+  • ping <host>         — testa conectividade
+  • tracert <host>      — rota até o destino
+  • ipconfig            — mostra IP/gateway/DNS
+  • nslookup <host>     — consulta DNS
+  • firewall status     — estado do firewall
+  • cable status        — link/velocidade
+  • clear               — limpa terminal
+  • help                — ajuda`;
+
+function termPrint(msg){ termOut.innerHTML += `\n${msg}`; termOut.scrollTop = termOut.scrollHeight; }
+function setTerm(msg){ termOut.textContent = msg; }
+
+function simulatePing(ok=true){
+  return new Promise(res=>{
+    let c=0; const id=setInterval(()=>{
+      c++; termPrint(`Reply from 8.8.8.8: bytes=32 time=${Math.floor(10+Math.random()*40)}ms TTL=117`);
+      if(c>=4){ clearInterval(id); res(true); }
+    }, 260);
+    if(!ok){ clearInterval(id); // override with timeouts
+      let t=0; const id2=setInterval(()=>{
+        t++; termPrint(`Request timed out.`);
+        if(t>=4){ clearInterval(id2); res(false); }
+      }, 300);
+    }
+  });
+}
+
+function simulateTracert(online=true){
+  const hops = [
+    '1   1 ms   1 ms   1 ms  192.168.0.1',
+    '2   4 ms   3 ms   4 ms  10.0.0.1',
+    '3  10 ms   9 ms  11 ms  isp.core.br',
+    '4  25 ms  21 ms  23 ms  8.8.8.8'
+  ];
+  if(!online) hops.splice(2,2,'3   *     *     *   Request timed out.','4   *     *     *   Request timed out.');
+  hops.forEach(h=> termPrint(h));
+}
+
+async function runCommand(){
+  const cmd = termIn.value.trim(); if(!cmd) return;
+  termPrint(`\nC:\\> ${cmd}`); termIn.value='';
+  const m = S.model;
+  if(cmd==='help'){ termPrint(helpText); return; }
+  if(cmd==='clear'){ setTerm(''); return; }
+  if(cmd.startsWith('ping')){
+    const ok = (m.link && m.nic && m.ip && m.routerOnline);
+    await simulatePing(ok);
+    return;
+  }
+  if(cmd==='ipconfig'){
+    termPrint(`Adaptador Ethernet:
+  IPv4 . . . . . . . . . . . . . . . . . . : ${m.ip ? '192.168.0.'+(50+S.i) : '169.254.10.5'}
+  Máscara . . . . . . . . . . . . . . . . : 255.255.255.0
+  Gateway padrão . . . . . . . . . . . . . : ${m.ip ? '192.168.0.1' : '0.0.0.0'}
+  DNS . . . . . . . . . . . . . . . . . . : ${m.dns ? (S.i%2? '1.1.1.1':'8.8.8.8') : '0.0.0.0'}
+  Mídia . . . . . . . . . . . . . . . . . : ${m.link && m.nic ? 'Conectado' : 'Desconectado'}`);
+    return;
+  }
+  if(cmd.startsWith('tracert')){
+    simulateTracert(m.routerOnline);
+    return;
+  }
+  if(cmd.startsWith('nslookup')){
+    if(!m.dns){ termPrint('*** Servidor DNS inexistente.\n*** A solicitação expirou.'); return; }
+    termPrint('Servidor: dns.google'); termPrint('Address: 8.8.8.8');
+    termPrint('Nome: example.com'); termPrint('Address: 93.184.216.34'); return;
+  }
+  if(cmd==='firewall status'){
+    termPrint(`Firewall: ${S.model.firewallBlock? 'ATIVO (bloqueio HTTP/HTTPS)': 'ATIVO (web liberada)'}`);
+    return;
+  }
+  if(cmd==='cable status'){
+    termPrint(`Link: ${m.link? 'UP':'DOWN'} | NIC: ${m.nic? 'UP':'DOWN'} | Velocidade: ${m.link? '1.0 Gbps':'—'}`);
+    return;
+  }
+  termPrint('Comando não reconhecido. Digite "help".');
+}
+
+/* ========= AÇÕES ========= */
+function penalty(sec, reason='Penalidade'){
+  S.time = Math.max(0, S.time-sec); updateHUD();
+  toast(`${reason} (-${sec}s)`, 'var(--red)'); beep(300,90);
+}
+
+function reward(points, reason='OK'){
+  S.score += points; updateHUD();
+  toast(`${reason} (+${points} pts)`, 'var(--green)'); beep(880,90);
+}
+
+function checkGoal(){
+  const sc = scenarios[S.i];
+  if(sc.goal(S.model)){
+    clearInterval(timerInt);
+    const earned = 50 + Math.floor(S.time*0.6);
+    reward(earned, 'Problema resolvido');
+    $('#btnNext').disabled=false;
+    $('#hudProgress').style.width = ((S.i+1)/scenarios.length)*100 + '%';
+    toast(`Cenário ${S.i+1} concluído!`, 'var(--green)');
+  }
+}
+
+/* NET window actions */
+function actionSetIP(){
+  if(!S.model.link || !S.model.nic){ penalty(8,'Sem link/NIC'); return;}
+  if(S.model.ip){ penalty(3,'IP já válido'); return;}
+  S.model.ip = true; $('#ipAddr').textContent = '192.168.0.'+(50+S.i); $('#gwAddr').textContent='192.168.0.1';
+  termPrint('DHCP: endereço obtido com sucesso.'); reward(10,'IP válido'); checkGoal();
+}
+function actionReleaseRenew(){
+  if(!S.model.link || !S.model.nic){ penalty(8,'Sem link/NIC'); return;}
+  S.model.ip = true; $('#ipAddr').textContent = '192.168.0.'+(60+S.i); $('#gwAddr').textContent='192.168.0.1';
+  termPrint('ipconfig /release & /renew concluído.'); reward(6,'DHCP renovado'); checkGoal();
+}
+function actionToggleNIC(){
+  S.model.nic = !S.model.nic;
+  $('#nicStatus').textContent = S.model.nic ? 'Ativo' : 'Desativado';
+  if(!S.model.nic){ S.model.link=false; $('#linkState').textContent='Desconectado'; $('#speedState').textContent='—'; }
+  beep(S.model.nic? 700:250,100);
+}
+
+function actionAllowWeb(){
+  if(!S.model.firewallBlock){ penalty(3,'Já liberado'); return;}
+  S.model.firewallBlock=false; $('#fwRule').textContent='Web liberada'; reward(12,'Regra aplicada'); checkGoal();
+}
+function actionToggleFW(){
+  // estado global apenas narrativo
+  const on = $('#fwState').textContent !== 'Ativo';
+  $('#fwState').textContent = on? 'Ativo':'Inativo';
+  toast(`Firewall ${on? 'ativado':'desativado'}`);
+}
+
+function actionSetDNS(ip){
+  S.model.dns=true; $('#dnsAddr').textContent=ip; reward(10,`DNS ${ip}`); checkGoal();
+}
+function actionFlushDNS(){ toast('Cache DNS limpo'); beep(760,70); }
+
+function actionRestartRouter(){
+  toast('Reiniciando roteador…', 'var(--yellow)'); penalty(5,'Reboot roteador (tempo)');
+  setTimeout(()=>{ S.model.routerOnline=true; $('#wanStatus').textContent='Online'; $('#loss').textContent='0%'; reward(15,'WAN ativa'); checkGoal(); }, 1200);
+}
+function actionCheckISP(){ toast('Teste com ISP… perda alta', 'var(--yellow)'); }
+
+function actionPlugCable(){
+  S.model.link = true; $('#linkState').textContent='Conectado'; $('#speedState').textContent='1.0 Gbps';
+  termPrint('NIC: link detectado a 1.0 Gbps.'); reward(8,'Cabo conectado'); checkGoal();
+}
+function actionSwapPort(){ toast('Porta trocada no switch'); beep(600,90); }
+
+function actionToggleWifi(){
+  const on = $('#wifiState').textContent !== 'Ligado';
+  $('#wifiState').textContent = on? 'Ligado':'Desligado';
+  toast(`Wi-Fi ${on? 'ligado':'desligado'}`);
+}
+
+/* ========= DICAS / AUTO-DIAGNÓSTICO ========= */
+$('#btnHint').onclick = ()=>{
+  const sc = scenarios[S.i];
+  penalty(10,'Dica usada');
+  toast('Dica: '+sc.hint, 'var(--yellow)');
+  termPrint('[Assistente] '+sc.hint);
+};
+
+$('#btnDiag').onclick = ()=>{
+  penalty(5,'Auto-diagnóstico');
+  const m=S.model;
+  let res=[];
+  if(!m.link) res.push('Sem link físico detectado.');
+  if(!m.nic) res.push('Placa de rede desativada.');
+  if(!m.ip) res.push('Endereço IP inválido/ausente.');
+  if(!m.routerOnline) res.push('Roteador sem conectividade WAN.');
+  if(m.firewallBlock) res.push('Firewall bloqueando web.');
+  if(!m.dns) res.push('Resolver DNS falhando.');
+  if(res.length===0) res.push('Sem problemas aparentes. Tente ping/tracert para confirmar.');
+  toast(res[0], 'var(--blue)');
+  termPrint('[Diagnóstico] '+res.join(' '));
+};
+
+/* ========= NEXT / FLOW ========= */
+$('#btnNext').onclick = ()=>{
+  S.i++;
+  if(S.i>=scenarios.length){ endGame(); return; }
+  initScenario();
+};
+
+function failScenario(msg){
+  toast(msg, 'var(--red)');
+  // Permite avançar com score zero daquele cenário (sem bônus)
+  $('#btnNext').disabled=false;
+}
+
+function endGame(){
+  $$('.window').forEach(w=>w.classList.remove('show'));
+  $('#desktop').innerHTML = `
+    <div class="scenario-card" style="text-align:center">
+      <div class="scenario-title">🏁 Fim do jogo</div>
+      <div class="scenario-text" style="margin-top:10px">Pontuação final: <b>${S.score}</b></div>
+      <div class="hints">Seu resultado foi salvo no leaderboard local deste navegador.</div>
+      <div style="margin-top:16px">
+        <button class="btn" onclick="saveAndRestart()">Jogar novamente</button>
+      </div>
+    </div>`;
+  saveLeaderboard(S.score);
+  renderLeaders();
+}
+
+/* ========= LEADERBOARD (localStorage) ========= */
+function saveLeaderboard(score){
+  const key='evonet_leaderboard';
+  const now=new Date();
+  const item={ score, when: now.toLocaleString() };
+  const arr = JSON.parse(localStorage.getItem(key) || '[]');
+  arr.push(item); arr.sort((a,b)=> b.score-a.score); if(arr.length>5) arr.length=5;
+  localStorage.setItem(key, JSON.stringify(arr));
+}
+function renderLeaders(){
+  const arr = JSON.parse(localStorage.getItem('evonet_leaderboard')||'[]');
+  $('#leaders').textContent = arr.map(a=> `${a.score} (${a.when})`).join(' • ') || '—';
+}
+
+/* ========= INIT ========= */
+function initScenario(){
+  const sc = scenarios[S.i];
+  S.model = JSON.parse(JSON.stringify(sc.model)); // deep clone
+  S.time = sc.timer;
+  $('#btnNext').disabled=true;
+  renderScenario(); updateHUD(); startTimer(); updatePanelsFromModel();
+  // reset terminal
+  setTerm('EvoShell v1.0 — digite "help" para ver comandos.');
+  // abrir automaticamente Terminal no início do primeiro cenário
+  if(S.i===0){ openWin('winTerminal'); }
+}
+
+function updatePanelsFromModel(){
+  const m=S.model;
+  // Net
+  $('#ipAddr').textContent = m.ip ? '192.168.0.'+(50+S.i) : '169.254.10.5';
+  $('#gwAddr').textContent = m.ip ? '192.168.0.1' : '0.0.0.0';
+  $('#nicStatus').textContent = m.nic ? 'Ativo' : 'Desativado';
+  // Firewall
+  $('#fwState').textContent='Ativo';
+  $('#fwRule').textContent = m.firewallBlock? 'Bloqueia HTTP/HTTPS' : 'Web liberada';
+  // DNS
+  $('#dnsAddr').textContent = m.dns? (S.i%2? '1.1.1.1':'8.8.8.8') : '0.0.0.0';
+  // Router
+  $('#wanStatus').textContent = m.routerOnline? 'Online':'Offline';
+  $('#loss').textContent = m.routerOnline? '0%':'100%';
+  // Cable
+  $('#linkState').textContent = m.link? 'Conectado':'Desconectado';
+  $('#speedState').textContent = m.link? '1.0 Gbps':'—';
+}
+
+/* ========= MISC ========= */
+document.addEventListener('keydown', e=>{
+  if(e.key==='Enter' && document.activeElement===termIn){ runCommand(); }
+});
+$('#btnMute').onclick = ()=>{
+  mute=!mute;
+  $('#btnMute').innerHTML = `<i class="fa-solid ${mute? 'fa-volume-xmark':'fa-volume-high'}"></i>`;
+};
+renderLeaders();
+initScenario();
+</script>
+</body>
+</html>

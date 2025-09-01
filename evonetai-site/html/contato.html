@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contato - EvoNet AI</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
+<style>
+/* RESET & BASE */
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
+body, html { height:100%; overflow-x:hidden; background:#0a0a0f; color:#fff; }
+
+/* ANIMAÇÃO DE FUNDO SURPRENDENTE */
+body {
+  background: linear-gradient(-45deg, #0a0a0f, #1a1a2e, #0f3057, #2a2a72);
+  background-size: 400% 400%;
+  animation: gradientBG 20s ease infinite;
+}
+
+/* HEADER SURPREENDENTE */
+.header {
+  width:100%;
+  background: rgba(17,24,39,0.85);
+  backdrop-filter: blur(12px);
+  padding:20px 60px;
+  position:fixed;
+  top:0; left:0;
+  z-index:1000;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+  border-bottom: 1px solid #4cc9f0;
+  animation: slideDown 1s ease;
+}
+.navbar { display:flex; justify-content:space-between; align-items:center; }
+.nav-logo { font-family:'Orbitron', sans-serif; font-size:2rem; color:#4cc9f0; font-weight:700; text-decoration:none; letter-spacing:2px; }
+.nav-logo span { color:#38a3c9; }
+.nav-menu { list-style:none; display:flex; gap:25px; }
+.nav-link { color:#fff; text-decoration:none; font-weight:600; font-size:1rem; position:relative; transition:0.3s; }
+.nav-link::after { content:''; position:absolute; width:0%; height:2px; bottom:-4px; left:0; background:#4cc9f0; transition:0.3s; }
+.nav-link:hover::after { width:100%; }
+.nav-link:hover { color:#4cc9f0; }
+
+/* ESPAÇO PARA HEADER */
+main { margin-top:120px; padding: 0 60px; }
+
+/* PAGE HEADER CINEMÁTICO */
+.page-header { text-align:center; padding:60px 20px; position:relative; z-index:1; }
+.page-header h1 { font-family:'Orbitron', sans-serif; font-size:3rem; background: linear-gradient(90deg,#4cc9f0,#38a3c9); -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation: glowText 2s ease-in-out infinite alternate; }
+.page-header p { font-size:1.2rem; color:#ccc; margin-top:10px; }
+
+/* CONTAINER CONTATO */
+.contact-container {
+  display:grid; grid-template-columns:1fr 1fr; gap:3rem; margin-top:2rem;
+  position:relative;
+}
+.contact-container::before {
+  content:'';
+  position:absolute;
+  width:100%; height:100%;
+  background: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size:25px 25px;
+  pointer-events:none;
+  animation: moveParticles 20s linear infinite;
+}
+
+/* CARD INFO E FORMULÁRIO */
+.contact-info, .contact-form {
+  background: rgba(17,24,39,0.8);
+  border-radius:15px;
+  padding:2.5rem;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+  position:relative;
+  overflow:hidden;
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+}
+.contact-info:hover, .contact-form:hover { transform: translateY(-5px); box-shadow: 0 20px 50px rgba(76,201,240,0.7); }
+
+/* TITULOS INTERATIVOS */
+.contact-info h2, .contact-form h2 {
+  font-family:'Orbitron', sans-serif;
+  font-size:1.5rem; color:#4cc9f0; margin-bottom:1rem;
+  text-shadow: 0 0 10px #4cc9f0;
+  display:flex; align-items:center; gap:10px;
+}
+
+/* INPUTS SURPREENDENTES */
+.contact-form input, .contact-form textarea {
+  width:100%; padding:1rem; margin-bottom:1.2rem;
+  border-radius:10px; border:none;
+  background: rgba(255,255,255,0.05); color:#fff;
+  font-size:1rem; transition: all 0.3s ease;
+}
+.contact-form input:focus, .contact-form textarea:focus {
+  background: rgba(76,201,240,0.1);
+  box-shadow: 0 0 15px #4cc9f0;
+  outline:none;
+}
+
+/* BOTÃO FUTURISTA */
+.contact-form button {
+  background: linear-gradient(135deg,#4cc9f0,#38a3c9);
+  color:#0a0a0f; font-weight:700; font-size:1rem; padding:1rem 1.5rem;
+  border:none; border-radius:12px; cursor:pointer;
+  position:relative; overflow:hidden; transition: all 0.4s ease;
+}
+.contact-form button::after {
+  content:''; position:absolute; width:300%; height:300%; background: rgba(255,255,255,0.2);
+  top:-100%; left:-100%; transform: rotate(45deg); transition: all 0.5s ease;
+}
+.contact-form button:hover::after { top:0; left:0; }
+.contact-form button:hover { transform: scale(1.05); box-shadow: 0 0 20px #4cc9f0; }
+
+/* MAPA MODERNO */
+#map { height:450px; width:100%; border-radius:15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-top:1rem; transition: transform 0.5s; }
+#map:hover { transform: scale(1.02); }
+
+/* FOOTER FUTURISTA */
+.footer { margin-top:3rem; text-align:center; padding:2rem; background:#111827; border-top:1px solid #4cc9f0; }
+.footer a { margin:0 10px; font-size:1.5rem; color:#4cc9f0; transition:0.3s; }
+.footer a:hover { color:#38a3c9; transform: scale(1.2); }
+
+/* ANIMAÇÕES */
+@keyframes gradientBG { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+@keyframes moveParticles { 0%{background-position:0 0} 100%{background-position:100% 100%} }
+@keyframes glowText { 0%{text-shadow:0 0 5px #4cc9f0} 100%{text-shadow:0 0 25px #38a3c9} }
+@keyframes slideDown { 0%{transform:translateY(-100px); opacity:0} 100%{transform:translateY(0); opacity:1} }
+
+/* RESPONSIVIDADE */
+@media(max-width:900px){
+  .contact-container { grid-template-columns:1fr; gap:2rem; }
+  main, .header { padding:0 20px; }
+  .page-header h1 { font-size:2.5rem; }
+}
+</style>
+<script>
+function initMap() {
+    const senacLocation = { lat: -23.5742, lng: -46.5616 };
+    const map = new google.maps.Map(document.getElementById("map"), {
+        zoom:16, center:senacLocation, disableDefaultUI:false
+    });
+    new google.maps.Marker({ position:senacLocation, map:map, title:"Senac Vila Prudente" });
+}
+</script>
+</head>
+<body>
+
+<header class="header"> 
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">EvoNet<span>AI</span></a>
+        <ul class="nav-menu">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="servicos.html" class="nav-link">Serviços</a></li>
+            <li><a href="projeto-de-rede.html" class="nav-link">Projetos</a></li>
+            <li><a href="mvp.html" class="nav-link">MVP</a></li>
+            <li><a href="plataforma.html" class="nav-link">Plataforma</a></li>
+            <li><a href="suporte-conformidade.html" class="nav-link">Suporte</a></li>
+            <li><a href="tecnologia.html" class="nav-link">Tecnologia</a></li>
+            <li><a href="contato.html" class="nav-link">Contato</a></li>
+            <li><a href="dominio.html" class="nav-link">Domínio</a></li>
+            <li><a href="login.html" class="nav-link">Login</a></li>
+            <li><a href="cadastro.html" class="nav-link">Cadastro</a></li>
+            <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+        </ul>
+        <div class="hamburger" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+    </nav>
+</header>
+
+<main>
+<section class="page-header">
+  <h1>Entre em Contato</h1>
+  <p>Estamos prontos para transformar sua experiência tecnológica. Envie-nos uma mensagem ou venha nos visitar.</p>
+</section>
+
+<section class="container contact-container">
+  <div class="contact-info">
+    <h2><i class="fas fa-map-marker-alt"></i> Nosso Endereço</h2>
+    <p>Rua do Orfanato, 316 – Vila Prudente, São Paulo - SP, 03131-010</p>
+    <p>Estação de metrô mais próxima: Vila Prudente (Linha 2-Verde e Linha 15-Prata)</p>
+    <div id="map"></div>
+    <h2 style="margin-top:2rem;"><i class="fas fa-phone"></i> Contato</h2>
+    <p>E-mail: <a href="mailto:contato@evonetai.com.br">contato@evonetai.com.br</a></p>
+    <p>Telefone: <a href="tel:+5511999999999">(11) 99999-9999</a></p>
+  </div>
+
+  <div class="contact-form">
+    <h2><i class="fas fa-envelope"></i> Fale Conosco</h2>
+    <form action="mailto:contato@evonetai.com.br" method="post" enctype="text/plain">
+      <input type="text" id="nome" name="nome" placeholder="Seu Nome" required>
+      <input type="email" id="email" name="email" placeholder="Seu E-mail" required>
+      <textarea id="mensagem" name="mensagem" rows="6" placeholder="Sua Mensagem" required></textarea>
+      <button type="submit"><i class="fas fa-paper-plane"></i> Enviar Mensagem</button>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer class="footer">
+  <div class="footer-socials">
+    <a href="http://linkedin.com/company/evonetai" target="_blank"><i class="fab fa-linkedin"></i></a>
+    <a href="http://youtube.com/@EvoNetAI" target="_blank"><i class="fab fa-youtube"></i></a>
+  </div>
+  <p>&copy; 2025 EvoNet AI. Todos os direitos reservados.</p>
+</footer>
+
+</body>
+</html>

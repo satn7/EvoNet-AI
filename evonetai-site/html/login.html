@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | EvoNet AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome para o ícone hamburger -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-pQbQ+XGJZR3XpI+bcHwIx0r2rM1Jw5z5J4jP0qLw1aC4+YwOjlV+9bQ+lzZmrpPTIj3lPzN8dH3G7uR2z5xYkg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <style>
+    /* Reset básico */
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
+
+    body {
+      background: radial-gradient(circle at top left, #0f2027, #203a43, #2c5364);
+      overflow-x: hidden;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:100vh;
+      color:#fff;
+    }
+
+    /* Header */
+    .header {
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: rgba(17,24,39,0.85);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+    }
+
+    .nav-logo { font-size:1.5rem; font-weight:700; color:#4cc9f0; text-decoration:none; }
+    .nav-logo span { color:#a26ce9; }
+
+    .nav-menu {
+      display: flex;
+      list-style:none;
+      gap:20px;
+    }
+
+    .nav-link {
+      text-decoration:none;
+      color:#fff;
+      font-weight:500;
+      transition: color 0.3s;
+    }
+
+    .nav-link:hover { color:#4cc9f0; }
+
+    .hamburger { display:none; font-size:1.5rem; cursor:pointer; color:#fff; }
+
+    @media(max-width:900px){
+      .nav-menu {
+        position: fixed;
+        top: 70px;
+        right: -100%;
+        width: 250px;
+        height: 100%;
+        background: rgba(17,24,39,0.95);
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding-top:50px;
+        gap:25px;
+        transition: right 0.3s ease;
+      }
+
+      .nav-menu.active { right:0; }
+      .hamburger { display:block; }
+    }
+
+    /* Partículas animadas */
+    .particles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0; left:0;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .particles span {
+      position: absolute;
+      width:6px; height:6px;
+      background: rgba(255,255,255,0.6);
+      border-radius:50%;
+      animation: float 10s linear infinite;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(100vh) scale(0.5); opacity:0; }
+      20% { opacity:1; }
+      100% { transform: translateY(-10vh) scale(1); opacity:0; }
+    }
+
+    /* Container login */
+    .container {
+      position: relative;
+      background: rgba(17, 24, 39, 0.65);
+      padding:45px;
+      border-radius:20px;
+      width:360px;
+      backdrop-filter: blur(18px);
+      box-shadow: 0 0 40px rgba(0,255,255,0.25);
+      text-align:center;
+      z-index:1;
+      animation: fadeIn 1.2s ease;
+    }
+
+    @keyframes fadeIn { from {opacity:0; transform:translateY(30px);} to {opacity:1; transform:translateY(0);} }
+
+    h2 {
+      margin-bottom:20px;
+      font-size:2rem;
+      background: linear-gradient(90deg,#4cc9f0,#a26ce9,#50e3c2);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      text-shadow:0 0 25px rgba(76,201,240,0.5);
+      letter-spacing:1px;
+    }
+
+    input {
+      width:100%; padding:14px; margin:12px 0;
+      border:none; border-radius:12px; outline:none;
+      background: rgba(255,255,255,0.08);
+      color:#fff; font-size:1rem;
+      transition: all 0.3s;
+    }
+
+    input:focus { background: rgba(255,255,255,0.15); box-shadow:0 0 12px #4cc9f0; }
+
+    button {
+      width:100%; padding:14px; margin-top:18px;
+      background: linear-gradient(135deg,#4cc9f0,#a26ce9);
+      border:none; border-radius:12px;
+      color:#fff; font-weight:600; cursor:pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+      font-size:1rem; box-shadow:0 0 18px rgba(76,201,240,0.4);
+    }
+
+    button:hover { transform:scale(1.08); box-shadow:0 0 25px rgba(162,108,233,0.6); }
+
+    .link { margin-top:18px; font-size:0.95rem; }
+    .link a { color:#4cc9f0; text-decoration:none; font-weight:600; transition:color 0.3s; }
+    .link a:hover { color:#a26ce9; }
+
+    /* Glow ao redor do container */
+    .container::before {
+      content:"";
+      position:absolute;
+      top:-2px; left:-2px; right:-2px; bottom:-2px;
+      border-radius:22px; padding:2px;
+      background: linear-gradient(45deg,#4cc9f0,#a26ce9,#50e3c2,#4cc9f0);
+      background-size:300% 300%;
+      animation: borderGlow 8s linear infinite;
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+
+    @keyframes borderGlow { 0%{background-position:0% 50%;} 50%{background-position:100% 50%;} 100%{background-position:0% 50%;} }
+  </style>
+</head>
+<body>
+  <!-- Header Navbar -->
+  <header class="header"> 
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">EvoNet<span>AI</span></a>
+        <ul class="nav-menu">
+            <li><a href="index.html" class="nav-link">Index</a></li>
+            <li><a href="servicos.html" class="nav-link">Serviços</a></li>
+            <li><a href="projeto-de-rede.html" class="nav-link">Projetos</a></li>
+            <li><a href="mvp.html" class="nav-link">MVP</a></li>
+            <li><a href="plataforma.html" class="nav-link">Plataforma</a></li>
+            <li><a href="suporte-conformidade.html" class="nav-link">Suporte</a></li>
+            <li><a href="tecnologia.html" class="nav-link">Tecnologia</a></li>
+            <li><a href="contato.html" class="nav-link">Contato</a></li>
+            <li><a href="dominio.html" class="nav-link">Domínio</a></li>
+            <li><a href="login.html" class="nav-link">Login</a></li>
+            <li><a href="cadastro.html" class="nav-link">Cadastro</a></li>
+            <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+        </ul>
+        <div class="hamburger" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+    </nav>
+  </header>
+
+  <!-- Fundo com partículas -->
+  <div class="particles"></div>
+
+  <!-- Container de login -->
+  <div class="container">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="E-mail" required>
+      <input type="password" id="password" placeholder="Senha" required>
+      <button type="submit">Entrar</button>
+    </form>
+    <div class="link">
+      <p>Não tem conta? <a href="cadastro.html">Cadastrar</a></p>
+    </div>
+  </div>
+
+  <script>
+    // Menu hamburger
+    function toggleMenu() {
+      const menu = document.querySelector('.nav-menu');
+      menu.classList.toggle('active');
+    }
+
+    // Geração de partículas
+    const particlesContainer = document.querySelector('.particles');
+    for(let i=0;i<40;i++){
+      const span = document.createElement('span');
+      const size = Math.random()*4+2;
+      span.style.width=size+"px";
+      span.style.height=size+"px";
+      span.style.left=Math.random()*window.innerWidth+"px";
+      span.style.animationDuration=(Math.random()*10+8)+"s";
+      span.style.animationDelay=Math.random()*5+"s";
+      particlesContainer.appendChild(span);
+    }
+
+    // Login simulado
+    const loginForm = document.getElementById('loginForm');
+    loginForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      if(email==="user@exemplo.com" && password==="123456"){
+        alert("✨ Login realizado com sucesso!");
+        window.location.href="home.html";
+      } else {
+        alert("❌ E-mail ou senha incorretos!");
+      }
+    });
+  </script>
+</body>
+</html>

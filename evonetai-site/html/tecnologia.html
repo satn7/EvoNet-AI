@@ -1,0 +1,182 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tecnologia - EvoNet AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+    body {
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        background-color: #12121b;
+        color: #e0e0e0;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* Navbar */
+    .header { background: #1a1a2e; padding: 1rem 2rem; position: sticky; top: 0; z-index: 100; }
+    .navbar { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: auto; }
+    .nav-logo { font-size: 1.8rem; font-weight: 700; color: #fff; }
+    .nav-logo span { color: #00d4ff; }
+    .nav-menu { display: flex; gap: 1.5rem; list-style: none; }
+    .nav-link { color: #e0e0e0; font-weight: 500; transition: 0.3s; }
+    .nav-link:hover { color: #00d4ff; }
+    .nav-login-btn { background: #00d4ff; color: #12121b; padding: 0.5rem 1rem; border-radius: 6px; transition: 0.3s; font-weight: 600; }
+    .nav-login-btn:hover { background: #00a3c4; color: #fff; }
+
+    /* Page Header */
+    .page-header { text-align: center; padding: 4rem 2rem; position: relative; overflow: hidden; }
+    .page-header h1 { font-size: 2.5rem; margin-bottom: 1rem; color: #00d4ff; }
+    .page-header p { font-size: 1.2rem; max-width: 700px; margin: auto; color: #e0e0e0; }
+
+    /* Particles container */
+    #particles-js { position: absolute; width: 100%; height: 100%; top: 0; left: 0; z-index: 0; }
+
+    /* Sections & Cards */
+    .container { max-width: 1200px; margin: 3rem auto; padding: 0 2rem; position: relative; z-index: 1; }
+    h2 { font-size: 2rem; margin-bottom: 1rem; color: #00d4ff; }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+    .card { background: #1e1e2f; border-radius: 8px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.5); color: #e0e0e0; transition: transform 0.3s; }
+    .card:hover { transform: translateY(-5px); }
+    .card h3 { color: #00d4ff; margin-bottom: 0.8rem; }
+    ul { padding-left: 1.2rem; margin-top: 0.5rem; }
+    li { margin-bottom: 0.5rem; }
+
+    /* Buttons */
+    .btn { display: inline-block; padding: 0.6rem 1.2rem; background: #00d4ff; color: #12121b; border-radius: 6px; font-weight: 600; transition: 0.3s; margin-top: 1rem; }
+    .btn:hover { background: #00a3c4; color: #fff; }
+
+    /* Footer */
+    .footer { background: #1a1a2e; color: #e0e0e0; padding: 2rem; text-align: center; }
+    .footer-socials { margin-bottom: 1rem; }
+    .footer-socials a { margin: 0 0.5rem; color: #00d4ff; font-weight: 500; transition: 0.3s; }
+    .footer-socials a:hover { color: #fff; }
+</style>
+</head>
+<body>
+
+<div id="particles-js"></div>
+
+<header class="header"> 
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">EvoNet<span>AI</span></a>
+        <ul class="nav-menu">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="servicos.html" class="nav-link">Serviços</a></li>
+            <li><a href="projeto-de-rede.html" class="nav-link">Projetos</a></li>
+            <li><a href="mvp.html" class="nav-link">MVP</a></li>
+            <li><a href="plataforma.html" class="nav-link">Plataforma</a></li>
+            <li><a href="suporte-conformidade.html" class="nav-link">Suporte</a></li>
+            <li><a href="tecnologia.html" class="nav-link">Tecnologia</a></li>
+            <li><a href="contato.html" class="nav-link">Contato</a></li>
+            <li><a href="dominio.html" class="nav-link">Domínio</a></li>
+            <li><a href="login.html" class="nav-link">Login</a></li>
+            <li><a href="cadastro.html" class="nav-link">Cadastro</a></li>
+            <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+        </ul>
+        <div class="hamburger" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+    </nav>
+</header>
+
+
+
+<main>
+    <section class="page-header">
+        <h1>Nossa Stack Tecnológica</h1>
+        <p>As ferramentas que potencializam a plataforma EvoNet AI.</p>
+    </section>
+
+    <section class="container">
+        <h2>Arquitetura e Tecnologias</h2>
+        <p>Utilizamos tecnologias open-source robustas e padrões de mercado para uma plataforma escalável e segura.</p>
+        <div class="card-grid">
+            <div class="card">
+                <h3>Frontend</h3>
+                <p>Interface moderna e interativa, com foco em terminal web.</p>
+                <ul>
+                    <li><strong>Framework:</strong> React.js</li>
+                    <li><strong>Terminal Web:</strong> Xterm.js</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Backend</h3>
+                <p>Gerencia usuários, sessões de laboratório e orquestra a infraestrutura.</p>
+                <ul>
+                    <li><strong>Linguagem/Framework:</strong> Python + FastAPI</li>
+                    <li><strong>API:</strong> RESTful</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Banco de Dados</h3>
+                <p>Armazena dados de usuários e laboratórios com confiabilidade.</p>
+                <ul>
+                    <li><strong>SGBD:</strong> PostgreSQL</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Simulador de Rede</h3>
+                <p>Integração via API, permitindo laboratórios realistas.</p>
+                <ul>
+                    <li><strong>Software:</strong> EVE-NG Community Edition</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Infraestrutura</h3>
+                <p>Ambiente containerizado robusto, escalável e seguro.</p>
+                <ul>
+                    <li><strong>SO:</strong> Ubuntu Server 20.04</li>
+                    <li><strong>Containerização:</strong> Docker</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    
+    <section class="container">
+        <h2>Projeto de Rede</h2>
+        <p>Infraestrutura seguindo as melhores práticas de mercado, com segmentação e segurança.</p>
+        <a href="projeto-de-rede.html" class="btn">Ver Detalhes da Rede</a>
+    </section>
+
+</main>
+
+<footer class="footer">
+    <div class="footer-socials">
+       <a href="http://linkedin.com/company/evonetai" target="_blank" title="LinkedIn">LinkedIn</a>
+       <a href="http://youtube.com/@EvoNetAI" target="_blank" title="YouTube">YouTube</a>
+   </div>
+   <p>&copy; 2025 EvoNet AI. Todos os direitos reservados.</p>
+</footer>
+
+<script>
+particlesJS("particles-js", {
+    "particles": {
+        "number": { "value": 60 },
+        "color": { "value": "#00d4ff" },
+        "shape": { "type": "circle" },
+        "opacity": { "value": 0.5 },
+        "size": { "value": 3 },
+        "line_linked": { "enable": true, "distance": 150, "color": "#00d4ff", "opacity": 0.4, "width": 1 },
+        "move": { "enable": true, "speed": 2 }
+    },
+    "interactivity": {
+        "detect_on": "canvas",
+        "events": {
+            "onhover": { "enable": true, "mode": "grab" },
+            "onclick": { "enable": true, "mode": "push" }
+        },
+        "modes": {
+            "grab": { "distance": 140, "line_linked": { "opacity": 0.7 } },
+            "push": { "particles_nb": 4 }
+        }
+    },
+    "retina_detect": true
+});
+</script>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

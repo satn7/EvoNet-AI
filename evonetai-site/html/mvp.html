@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MVP Surreal — EvoNet AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Exo+2:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg-color: #0a0a0f;
+    --primary-glow: #00d4ff;
+    --secondary-glow: #4caf50;
+    --pc2-color: #ff4500;
+    --text-color: #e0e0e0;
+    --card-bg: rgba(17,17,27,0.6);
+    --border-color: rgba(0,212,255,0.2);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Roboto Mono', monospace;
+    overflow-x:hidden;
+    background-image:
+        linear-gradient(rgba(0,212,255,0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: moveGrid 15s linear infinite;
+}
+@keyframes moveGrid { from{background-position:0 0;} to{background-position:50px 50px;} }
+a{text-decoration:none;color:inherit;}
+.header{background: rgba(18,18,27,0.8);backdrop-filter: blur(10px); padding:1rem 2rem; position:sticky;top:0; z-index:1000; border-bottom:1px solid var(--border-color);}
+.navbar{display:flex;justify-content:space-between;align-items:center;max-width:1200px;margin:auto;}
+.nav-logo{font-family:'Exo 2',sans-serif;font-size:1.8rem;font-weight:900;color:var(--primary-glow);letter-spacing:1px;}
+.nav-logo span{color:var(--secondary-glow);}
+.nav-menu{display:flex;gap:1.5rem;list-style:none;}
+.nav-link{font-weight:700;transition:0.3s;position:relative;}
+.nav-link:hover{color:var(--primary-glow);}
+.nav-link::after{content:'';position:absolute;bottom:-5px;left:0;width:0;height:2px;background:var(--primary-glow);transition:width 0.3s;}
+.nav-link:hover::after{width:100%;}
+.hamburger{display:none;cursor:pointer;font-size:1.5rem;color:var(--primary-glow);}
+@media(max-width:900px){.nav-menu{display:none;flex-direction:column;background: rgba(18,18,27,0.9);position:absolute;top:100%;right:0;width:250px;padding:1rem;border-left:1px solid var(--border-color);}.nav-menu.active{display:flex;}.hamburger{display:block;}}
+.page-header{text-align:center;padding:6rem 2rem;}
+.page-header h1{font-family:'Exo 2',sans-serif;font-size:3.5rem;color:var(--primary-glow);margin-bottom:1rem;text-shadow:0 0 15px var(--primary-glow);}
+.page-header p{font-size:1.2rem;max-width:700px;margin:auto;color:var(--text-color);}
+.container{max-width:1200px;margin:3rem auto;padding:0 2rem;}
+.container h2{font-family:'Exo 2',sans-serif;font-size:2.5rem;margin-bottom:1.5rem;color:var(--primary-glow);border-bottom:2px solid var(--border-color);padding-bottom:0.5rem;}
+.card{background: var(--card-bg); backdrop-filter: blur(5px); border:1px solid var(--border-color); border-radius:16px; padding:2rem; margin-bottom:2rem; box-shadow:0 8px 32px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,212,255,0.1);}
+pre{background: rgba(0,0,0,0.5); padding:1.5rem; border-radius:8px; overflow-x:auto; color: var(--secondary-glow); border-left:3px solid var(--secondary-glow);}
+#network-container{position:relative;width:100%;height:500px;margin:auto;border-radius:16px;overflow:hidden;background:#0a0a0f;border:2px solid var(--border-color);box-shadow:0 0 20px rgba(0,212,255,0.3);}
+#network-canvas{position:absolute;top:0;left:0;width:100%;height:100%;cursor:default;}
+#terminal-container{margin-top:1.5rem;display:flex;gap:1rem;}
+#cmd{flex:1;padding:14px;border-radius:8px;border:1px solid var(--border-color);background: rgba(0,0,0,0.5); color:var(--primary-glow); font-family:'Roboto Mono', monospace; font-size:1rem;}
+#cmd:focus{outline:none;border-color:var(--primary-glow);box-shadow:0 0 10px var(--primary-glow);}
+.btn-terminal{padding:14px 24px;border-radius:8px;font-weight:700;cursor:pointer;transition:0.3s;font-family:'Exo 2',sans-serif;}
+#cmd-btn{background:var(--primary-glow);color:#000;}
+#cmd-btn:hover{background:#fff;box-shadow:0 0 15px #fff;}
+#reset-btn{background:transparent;color:var(--pc2-color);border:2px solid var(--pc2-color);}
+#reset-btn:hover{background:var(--pc2-color);color:#000;box-shadow:0 0 15px var(--pc2-color);}
+#info-box{margin-top:1rem;background: rgba(0,0,0,0.6); padding:14px; border-radius:8px; color:var(--primary-glow); min-height:40px; border-left:3px solid var(--primary-glow);}
+.footer{border-top:1px solid var(--border-color); color:#aaa; padding:2rem;text-align:center;}
+</style>
+</head>
+<body>
+
+<header class="header"> 
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">EvoNet<span>AI</span></a>
+        <ul class="nav-menu">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="servicos.html" class="nav-link">Serviços</a></li>
+            <li><a href="projeto-de-rede.html" class="nav-link">Projetos</a></li>
+            <li><a href="mvp.html" class="nav-link">MVP</a></li>
+            <li><a href="plataforma.html" class="nav-link">Plataforma</a></li>
+            <li><a href="suporte-conformidade.html" class="nav-link">Suporte</a></li>
+            <li><a href="tecnologia.html" class="nav-link">Tecnologia</a></li>
+            <li><a href="contato.html" class="nav-link">Contato</a></li>
+            <li><a href="dominio.html" class="nav-link">Domínio</a></li>
+            <li><a href="login.html" class="nav-link">Login</a></li>
+            <li><a href="cadastro.html" class="nav-link">Cadastro</a></li>
+            <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+        </ul>
+        <div class="hamburger" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+    </nav>
+</header>
+
+
+<main>
+    <section class="page-header">
+        <h1>Plano de Desenvolvimento: MVP</h1>
+        <p>Simulação interativa surreal da primeira versão da EvoNet AI. Experimente pacotes animados, VLANs e roteamento.</p>
+    </section>
+
+    <section class="container">
+        <h2>Lab 01: Fundamentos de VLANs e Roteamento</h2>
+        <div class="card">
+            <h3>Topologia Virtual</h3>
+            <pre>
++-----------------+
+|   Roteador-R1   |
++-------+---------+
+        | .1Q (Trunk)
+        | Fa0/0
++-------+---------+
+|     Switch-S1     |
++---+---------+---+
+    | Fa0/2   | Fa0/3
++---+-------+ +-------+---+
+| PC-VLAN10 | | PC-VLAN20 |
++-----------+ +-----------+
+VLAN 10 (TI)  VLAN 20 (RH)
+192.168.10.10   192.168.20.10
+            </pre>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2>Simulação Interativa</h2>
+        <p><strong>Clique em um PC para enviar ping ou use o terminal abaixo.</strong></p>
+        <div id="network-container">
+            <canvas id="network-canvas"></canvas>
+        </div>
+        <div id="terminal-container">
+            <input type="text" id="cmd" placeholder="Ex: ping 192.168.20.10">
+            <button id="cmd-btn" class="btn-terminal">Executar</button>
+            <button id="reset-btn" class="btn-terminal">Reset</button>
+        </div>
+        <div id="info-box">Terminal aguardando comando...</div>
+    </section>
+</main>
+
+<footer class="footer">
+    <p>&copy; <span id="year"></span> EvoNet AI — Todos os direitos reservados.</p>
+</footer>
+
+<script>
+function toggleMenu(){document.querySelector('.nav-menu').classList.toggle('active');}
+document.addEventListener("DOMContentLoaded", () => {
+    const canvas = document.getElementById('network-canvas');
+    const ctx = canvas.getContext('2d');
+    const infoBox = document.getElementById('info-box');
+    const cmdInput = document.getElementById('cmd');
+    const cmdBtn = document.getElementById('cmd-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    let animationId, packets = [];
+
+    function resize() { canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight; }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function hexToRgb(hex){
+        const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+        return `${r},${g},${b}`;
+    }
+
+    class Node {
+        constructor(id,x,y,label,color){
+            this.id=id;this.x=x;this.y=y;this.label=label;this.color=color;this.radius=35;this.hover=false;this.pulse=0;
+        }
+        draw(){
+            if(this.pulse>0){ctx.beginPath();ctx.arc(this.x,this.y,this.radius+this.pulse,0,Math.PI*2);ctx.fillStyle=`rgba(${hexToRgb(this.color)},${this.pulse/10})`;ctx.fill();this.pulse-=0.2;}
+            ctx.fillStyle=this.color;ctx.shadowColor=this.color;ctx.shadowBlur=this.hover?25:15;ctx.beginPath();ctx.arc(this.x,this.y,this.radius,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+            ctx.fillStyle="#fff";ctx.font="bold 13px Exo 2";ctx.textAlign="center";ctx.fillText(this.label.split("\n")[0],this.x,this.y+50);ctx.font="12px Roboto Mono";ctx.fillText(this.label.split("\n")[1]||"",this.x,this.y+65);
+        }
+        triggerPulse(){this.pulse=15;}
+        isClicked(mx,my){return Math.sqrt((mx-this.x)**2+(my-this.y)**2)<this.radius;}
+    }
+
+    class Packet {
+        constructor(path,color){this.path=path;this.color=color;this.current=0;this.progress=0;this.radius=12;this.trail=[];}
+        update(){
+            if(this.current>=this.path.length-1)return true;
+            this.trail.push({x:this.x||this.path[0].x,y:this.y||this.path[0].y});
+            if(this.trail.length>20)this.trail.shift();
+            this.progress+=0.03;
+            const s=this.path[this.current],e=this.path[this.current+1];
+            this.x=s.x+(e.x-s.x)*this.progress;this.y=s.y+(e.y-s.y)*this.progress;
+            if(this.progress>=1){this.progress=0;this.current++;this.path[this.current].triggerPulse();}
+            return false;
+        }
+        draw(){
+            this.trail.forEach((p,i)=>{ctx.beginPath();ctx.fillStyle=`rgba(${hexToRgb(this.color)},${i/this.trail.length*0.5})`;ctx.arc(p.x,p.y,this.radius*(i/this.trail.length),0,Math.PI*2);ctx.fill();});
+            ctx.fillStyle=this.color;ctx.beginPath();ctx.arc(this.x,this.y,this.radius,0,Math.PI*2);ctx.fill();
+        }
+    }
+
+    const nodes={
+        pc10:new Node("pc10",150,400,"PC-VLAN10\n192.168.10.10","#00d4ff"),
+        pc20:new Node("pc20",canvas.width-150,400,"PC-VLAN20\n192.168.20.10","#ff4500"),
+        sw:new Node("sw",canvas.width/2,250,"Switch-S1","#ff9800"),
+        r:new Node("r",canvas.width/2,80,"Roteador-R1","#4caf50")
+    };
+
+    function drawLinks(active=null){
+        const links=[[nodes.pc10,nodes.sw],[nodes.pc20,nodes.sw],[nodes.sw,nodes.r]];
+        links.forEach(l=>{
+            ctx.strokeStyle=active&&(active[0]===l[0]&&active[1]===l[1])?"#0ff":"#888";
+            ctx.lineWidth=active&&(active[0]===l[0]&&active[1]===l[1])?4:2;
+            ctx.beginPath();ctx.moveTo(l[0].x,l[0].y);ctx.lineTo(l[1].x,l[1].y);ctx.stroke();
+        });
+    }
+
+    function animate(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        drawLinks();
+        Object.values(nodes).forEach(n=>n.draw());
+        for(let i=packets.length-1;i>=0;i--){
+            packets[i].draw();
+            if(packets[i].update()){packets.splice(i,1);}
+        }
+        animationId=requestAnimationFrame(animate);
+    }
+
+    function sendPing(from,to){
+        if(packets.length>0){infoBox.innerHTML="> Aguarde a simulação atual terminar.";return;}
+        const path=[nodes[from],nodes.sw,nodes.r,nodes.sw,nodes[to]];
+        nodes[from].triggerPulse();
+        packets.push(new Packet(path,nodes[from].color));
+        infoBox.innerHTML=`> Pacote enviado de ${nodes[from].label.split("\n")[0]} para ${nodes[to].label.split("\n")[0]}`;
+    }
+
+    cmdBtn.addEventListener("click",()=>{const val=cmdInput.value.trim().toLowerCase();if(val.startsWith("ping ")){const ip=val.split(" ")[1];if(ip==="192.168.20.10")sendPing("pc10","pc20");else if(ip==="192.168.10.10")sendPing("pc20","pc10");else infoBox.innerHTML=`> IP ${ip} não reconhecido`;cmdInput.value="";}});
+    cmdInput.addEventListener("keypress",e=>{if(e.key==="Enter")cmdBtn.click();});
+    resetBtn.addEventListener("click",()=>{packets=[];infoBox.innerHTML="> Simulação resetada";});
+
+    canvas.addEventListener("click",e=>{const r=canvas.getBoundingClientRect();const mx=e.clientX-r.left,my=e.clientY-r.top;if(nodes.pc10.isClicked(mx,my))sendPing("pc10","pc20");else if(nodes.pc20.isClicked(mx,my))sendPing("pc20","pc10");});
+
+    canvas.addEventListener("mousemove",e=>{const r=canvas.getBoundingClientRect();const mx=e.clientX-r.left,my=e.clientY-r.top;let hovering=false;Object.values(nodes).forEach(n=>{if(n.isClicked(mx,my)){n.hover=true;hovering=true;}else n.hover=false;});canvas.style.cursor=hovering?"pointer":"default";});
+
+    document.getElementById('year').textContent=new Date().getFullYear();
+    animate();
+});
+</script>
+
+</body>
+</html>
