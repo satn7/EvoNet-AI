@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Surreal - EvoNet AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
+  body { min-height:100vh; display:flex; flex-direction:column; background: radial-gradient(circle at top left, #0f2027, #203a43, #2c5364); color:#fff; overflow-x:hidden; position:relative; }
+  /* Navbar */
+  .header { width:100%; position: fixed; top:0; left:0; background: rgba(17,24,39,0.85); backdrop-filter: blur(10px); z-index:100; }
+  .navbar { display:flex; justify-content:space-between; align-items:center; padding:15px 30px; }
+  .nav-logo { font-size:1.5rem; font-weight:700; color:#4cc9f0; text-decoration:none; }
+  .nav-logo span { color:#a26ce9; }
+  .nav-menu { display:flex; list-style:none; gap:20px; }
+  .nav-link { text-decoration:none; color:#fff; font-weight:500; transition: color 0.3s; }
+  .nav-link:hover { color:#4cc9f0; }
+  .hamburger { display:none; font-size:1.5rem; cursor:pointer; color:#fff; }
+  @media(max-width:900px){
+    .nav-menu { position: fixed; top: 70px; right: -100%; width: 250px; height: 100%; background: rgba(17,24,39,0.95); flex-direction: column; align-items: center; padding-top:50px; gap:25px; transition: right 0.3s ease; }
+    .nav-menu.active { right:0; }
+    .hamburger { display:block; }
+  }
+
+  /* Partículas */
+  .particles { position:absolute; width:100%; height:100%; top:0; left:0; z-index:0; overflow:hidden; }
+  .particles span { position:absolute; width:6px; height:6px; background: rgba(255,255,255,0.6); border-radius:50%; animation: float 12s linear infinite; }
+  @keyframes float { 0%{transform:translateY(100vh) scale(0.5); opacity:0;} 20%{opacity:1;} 100%{transform:translateY(-10vh) scale(1); opacity:0;} }
+
+  /* Page header */
+  .page-header { text-align:center; margin-top:100px; margin-bottom:40px; z-index:1; position:relative; }
+  .page-header h1 { font-size:2.5rem; background: linear-gradient(90deg,#4cc9f0,#a26ce9,#50e3c2); -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-shadow:0 0 25px rgba(76,201,240,0.5); }
+  .page-header p { font-size:1.2rem; color:#ccc; }
+
+  /* Container e Cards */
+  .container { width:90%; max-width:1200px; margin:0 auto 60px auto; display:flex; flex-direction:column; gap:30px; position:relative; z-index:1; }
+  .card-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap:25px; }
+  .card { background: rgba(17,24,39,0.65); border-radius:20px; padding:25px; box-shadow:0 0 25px rgba(76,201,240,0.4); transition: transform 0.3s, box-shadow 0.3s; backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.1); }
+  .card:hover { transform: translateY(-8px) scale(1.02); box-shadow:0 0 40px rgba(162,108,233,0.6); }
+  .card h3 { color:#4cc9f0; margin-bottom:12px; font-size:1.3rem; }
+  .card p { color:#ddd; line-height:1.6; margin-bottom:20px; }
+
+  .btn { background: linear-gradient(135deg,#4cc9f0,#a26ce9); color:#fff; padding:12px 20px; border:none; border-radius:12px; cursor:pointer; font-size:1rem; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:8px; box-shadow:0 0 20px rgba(76,201,240,0.6); transition: all 0.3s ease-in-out; }
+  .btn:hover { transform: scale(1.05); box-shadow:0 0 35px rgba(162,108,233,0.8); }
+
+  /* Laboratório Modal */
+  .lab-modal { position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:9999; overflow:auto; padding:20px; }
+  .lab-content { background: rgba(17,24,39,0.85); border-radius:20px; padding:25px; max-width:900px; width:100%; position:relative; backdrop-filter:blur(12px); box-shadow:0 0 40px rgba(76,201,240,0.6); }
+  .lab-close { position:absolute; top:15px; right:20px; cursor:pointer; font-size:1.5rem; color:#fff; }
+  .lab-header { margin-bottom:15px; }
+  .lab-header h2 { background: linear-gradient(90deg,#4cc9f0,#a26ce9,#50e3c2); -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-shadow:0 0 15px rgba(76,201,240,0.4); }
+  .lab-body { display:flex; flex-direction:column; gap:15px; }
+  .lab-console { background: rgba(0,0,0,0.3); color:#0ff; font-family: monospace; padding:15px; border-radius:12px; max-height:250px; overflow-y:auto; }
+
+  /* Visual Lab Area */
+  .visual-lab { position:relative; height:300px; background: rgba(0,0,0,0.2); border-radius:12px; display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:30px; padding:15px; }
+
+  .device { width:60px; height:60px; border-radius:50%; background:#4cc9f0; display:flex; justify-content:center; align-items:center; color:#000; font-weight:bold; cursor:pointer; box-shadow:0 0 15px rgba(76,201,240,0.7); position:relative; transition: transform 0.3s; }
+  .device:hover { transform: scale(1.2); }
+  .link-line { position:absolute; height:3px; background:#50e3c2; top:50%; left:50%; transform-origin:left center; }
+
+  /* Footer */
+  footer.footer { text-align:center; padding:20px 0; background: rgba(17,24,39,0.65); backdrop-filter: blur(12px); box-shadow: 0 -4px 20px rgba(0,0,0,0.3); color:#bbb; position:relative; z-index:1; margin-top:auto; }
+
+</style>
+</head>
+<body>
+
+ <!-- Navbar -->
+  <header class="header">
+    <nav class="navbar">
+      <a href="home.html" class="nav-logo">EvoNet<span>AI</span></a>
+      <ul class="nav-menu">
+        <li><a href="home.html" class="nav-link">Home</a></li>
+        <li><a href="cadastro.html" class="nav-link">Cadastrar</a></li>
+        <li><a href="login.html" class="nav-link">Entrar</a></li>
+        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+        <li><a href="dominio.html" class="nav-link">Domínio</a></li>
+        <li><a href="mvp.html" class="nav-link">MVP</a></li>
+        <li><a href="plataforma.html" class="nav-link">Plataforma</a></li>
+        <li><a href="projeto-de-rede.html" class="nav-link">Projeto de Rede</a></li>
+        <li><a href="servicos.html" class="nav-link">Serviços</a></li>
+        <li><a href="suporte-conformidade.html" class="nav-link">Suporte</a></li>
+        <li><a href="tecnologia.html" class="nav-link">Tecnologia</a></li>
+      </ul>
+      <div class="hamburger" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+    </nav>
+  </header>
+
+<div class="particles"></div>
+
+<main>
+  <section class="page-header">
+    <h1>Bem-vindo, Aluno!</h1>
+    <p>Seu ambiente de aprendizado está pronto.</p>
+  </section>
+
+  <section class="container">
+    <h2>Meus Laboratórios</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3><i class="fas fa-network-wired"></i> Lab 01: VLAN</h3>
+        <p>Crie VLANs, conecte PCs e visualize o tráfego.</p>
+        <button class="btn" onclick="openLab(1)"><i class="fas fa-play"></i> Abrir Lab</button>
+      </div>
+      <div class="card">
+        <h3><i class="fas fa-route"></i> Lab 02: OSPF</h3>
+        <p>Configure roteadores OSPF e veja rotas se propagarem.</p>
+        <button class="btn" onclick="openLab(2)"><i class="fas fa-play"></i> Abrir Lab</button>
+      </div>
+      <div class="card">
+        <h3><i class="fas fa-robot"></i> Lab 03: Ansible</h3>
+        <p>Automatize a configuração de dispositivos em tempo real.</p>
+        <button class="btn" onclick="openLab(3)"><i class="fas fa-play"></i> Abrir Lab</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="lab-modal" id="labModal">
+  <div class="lab-content">
+    <span class="lab-close" onclick="closeLab()">&times;</span>
+    <div class="lab-header">
+      <h2 id="labTitle"></h2>
+    </div>
+    <div class="lab-body">
+      <div class="visual-lab" id="visualLab"></div>
+      <div class="lab-console" id="labConsole"></div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>&copy; <span id="year"></span> EvoNet AI. Todos os direitos reservados.</p>
+</footer>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// Hamburger menu
+function toggleMenu(){ document.querySelector('.nav-menu').classList.toggle('active'); }
+
+// Partículas
+const particlesContainer = document.querySelector('.particles');
+for(let i=0;i<40;i++){
+  const span = document.createElement('span');
+  const size = Math.random()*4+2;
+  span.style.width=size+'px'; span.style.height=size+'px';
+  span.style.left=Math.random()*window.innerWidth+'px';
+  span.style.animationDuration=(Math.random()*12+8)+'s';
+  span.style.animationDelay=Math.random()*5+'s';
+  particlesContainer.appendChild(span);
+}
+
+// Laboratórios
+let currentLab = 0;
+const labModal = document.getElementById('labModal');
+const labTitle = document.getElementById('labTitle');
+const visualLab = document.getElementById('visualLab');
+const labConsole = document.getElementById('labConsole');
+
+function openLab(lab){
+  currentLab = lab;
+  labModal.style.display='flex';
+  visualLab.innerHTML=''; labConsole.textContent='';
+  if(lab===1){
+    labTitle.textContent='Lab 01: VLAN e Inter-VLAN';
+    setupLabVLAN();
+  }else if(lab===2){
+    labTitle.textContent='Lab 02: OSPF Dinâmico';
+    setupLabOSPF();
+  }else{
+    labTitle.textContent='Lab 03: Automação com Ansible';
+    setupLabAnsible();
+  }
+}
+
+function closeLab(){ labModal.style.display='none'; }
+
+// Lab 1 - VLAN
+function setupLabVLAN(){
+  const pc1 = createDevice('PC1'), pc2=createDevice('PC2'), pc3=createDevice('PC3'), sw=createDevice('SW','S');
+  visualLab.appendChild(pc1); visualLab.appendChild(pc2); visualLab.appendChild(pc3); visualLab.appendChild(sw);
+  createLink(pc1,sw); createLink(pc2,sw); createLink(pc3,sw);
+  logLab('VLANs criadas: VLAN10 para PC1, VLAN20 para PC2 e PC3');
+  animatePacket(pc1,pc2);
+}
+
+// Lab 2 - OSPF
+function setupLabOSPF(){
+  const r1=createDevice('R1','R'), r2=createDevice('R2','R'), r3=createDevice('R3','R');
+  visualLab.appendChild(r1); visualLab.appendChild(r2); visualLab.appendChild(r3);
+  createLink(r1,r2); createLink(r2,r3); createLink(r1,r3);
+  logLab('OSPF iniciado entre R1, R2 e R3');
+  animatePacket(r1,r3,true);
+}
+
+// Lab 3 - Ansible
+function setupLabAnsible(){
+  const s1=createDevice('SW1','S'), s2=createDevice('SW2','S');
+  visualLab.appendChild(s1); visualLab.appendChild(s2);
+  logLab('Digite playbooks no console (simulado)');
+  let step=0;
+  const interval = setInterval(()=>{
+    if(step>3){ clearInterval(interval); logLab('Todos dispositivos configurados via Ansible!'); return; }
+    logLab(`Aplicando playbook... Step ${step+1}`);
+    step++;
+  },1000);
+}
+
+// Helpers
+function createDevice(name,type='P'){
+  const d = document.createElement('div'); d.className='device'; d.textContent=name; return d;
+}
+function createLink(a,b){
+  const line = document.createElement('div'); line.className='link-line';
+  visualLab.appendChild(line);
+  const rectA=a.getBoundingClientRect(), rectB=b.getBoundingClientRect();
+  setTimeout(()=>positionLine(line,a,b),100);
+}
+function positionLine(line,a,b){
+  const ax=a.offsetLeft+30, ay=a.offsetTop+30;
+  const bx=b.offsetLeft+30, by=b.offsetTop+30;
+  const dx=bx-ax, dy=by-ay;
+  const length=Math.sqrt(dx*dx+dy*dy);
+  line.style.width=length+'px';
+  line.style.transform=`translate(${ax}px,${ay}px) rotate(${Math.atan2(dy,dx)}rad)`;
+}
+function animatePacket(from,to,loop=false){
+  const packet=document.createElement('div'); packet.style.width='12px'; packet.style.height='12px'; packet.style.background='#50e3c2'; packet.style.borderRadius='50%'; packet.style.position='absolute';
+  visualLab.appendChild(packet);
+  const ax=from.offsetLeft+30, ay=from.offsetTop+30;
+  const bx=to.offsetLeft+30, by=to.offsetTop+30;
+  let t=0;
+  const anim = setInterval(()=>{
+    t+=0.02;
+    if(t>1){ if(loop)t=0; else clearInterval(anim); }
+    packet.style.left=(ax+(bx-ax)*t)+'px';
+    packet.style.top=(ay+(by-ay)*t)+'px';
+  },20);
+}
+function logLab(msg){ labConsole.textContent+=msg+'\n'; labConsole.scrollTop=labConsole.scrollHeight; }
+
+</script>
+</body>
+</html>

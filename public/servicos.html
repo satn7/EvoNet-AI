@@ -1,0 +1,165 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Serviços - EvoNet AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #12121b;
+      color: #e0e0e0;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* Navbar */
+    .header { background: #1a1a2e; padding: 1rem 2rem; position: sticky; top: 0; z-index: 100; }
+    .navbar { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: auto; }
+    .nav-logo { font-size: 1.8rem; font-weight: 700; color: #fff; }
+    .nav-logo span { color: #00d4ff; }
+    .nav-menu { display: flex; gap: 1.5rem; list-style: none; }
+    .nav-link { color: #e0e0e0; font-weight: 500; transition: 0.3s; }
+    .nav-link:hover { color: #00d4ff; }
+    .nav-login-btn { background: #00d4ff; color: #12121b; padding: 0.5rem 1rem; border-radius: 6px; transition: 0.3s; font-weight: 600; }
+    .nav-login-btn:hover { background: #00a3c4; color: #fff; }
+
+    /* Page Header */
+    .page-header { text-align: center; padding: 4rem 2rem; position: relative; overflow: hidden; }
+    .page-header h1 { font-size: 2.5rem; margin-bottom: 1rem; color: #00d4ff; }
+    .page-header p { font-size: 1.2rem; max-width: 700px; margin: auto; color: #e0e0e0; }
+
+    /* Particles container */
+    #particles-js { position: absolute; width: 100%; height: 100%; top: 0; left: 0; z-index: 0; }
+
+    /* Sections & Cards */
+    .container { max-width: 1200px; margin: 3rem auto; padding: 0 2rem; position: relative; z-index: 1; }
+    h2 { font-size: 2rem; margin-bottom: 1rem; color: #00d4ff; }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+    .card { background: #1e1e2f; border-radius: 8px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.5); color: #e0e0e0; transition: transform 0.3s; }
+    .card:hover { transform: translateY(-5px); }
+    .card h3 { color: #00d4ff; margin-bottom: 0.8rem; }
+    ul { padding-left: 1.2rem; margin-top: 0.5rem; }
+    li { margin-bottom: 0.5rem; }
+
+    /* Buttons */
+    .btn { display: inline-block; padding: 0.6rem 1.2rem; background: #00d4ff; color: #12121b; border-radius: 6px; font-weight: 600; transition: 0.3s; margin-top: 1rem; }
+    .btn:hover { background: #00a3c4; color: #fff; }
+
+    /* Footer */
+    .footer { background: #1a1a2e; color: #e0e0e0; padding: 2rem; text-align: center; }
+    .footer-socials { margin-bottom: 1rem; }
+    .footer-socials a { margin: 0 0.5rem; color: #00d4ff; font-weight: 500; transition: 0.3s; }
+    .footer-socials a:hover { color: #fff; }
+  </style>
+</head>
+
+<body>
+  <div id="particles-js"></div>
+
+   <!-- Navbar -->
+  <header class="header">
+    <nav class="navbar">
+      <a href="home.html" class="nav-logo">EvoNet<span>AI</span></a>
+      <ul class="nav-menu">
+        <li><a href="home.html" class="nav-link">Home</a></li>
+        <li><a href="cadastro.html" class="nav-link">Cadastrar</a></li>
+        <li><a href="login.html" class="nav-link">Entrar</a></li>
+        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+        <li><a href="dominio.html" class="nav-link">Domínio</a></li>
+        <li><a href="mvp.html" class="nav-link">MVP</a></li>
+        <li><a href="plataforma.html" class="nav-link">Plataforma</a></li>
+        <li><a href="projeto-de-rede.html" class="nav-link">Projeto de Rede</a></li>
+        <li><a href="servicos.html" class="nav-link">Serviços</a></li>
+        <li><a href="suporte-conformidade.html" class="nav-link">Suporte</a></li>
+        <li><a href="tecnologia.html" class="nav-link">Tecnologia</a></li>
+      </ul>
+      <div class="hamburger" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+    </nav>
+  </header>
+
+  <!-- Conteúdo -->
+  <main>
+    <section class="page-header">
+      <h1>Nosso Portfólio de Serviços</h1>
+      <p>Soluções flexíveis para capacitar sua instituição e seus alunos.</p>
+    </section>
+
+    <section class="container">
+      <h2>Como podemos ajudar</h2>
+      <div class="card-grid">
+        <div class="card">
+          <h3>Plataforma de Treinamento (SaaS)</h3>
+          <p>O coração da nossa solução. Um ambiente de aprendizado online com laboratórios virtuais pré-configurados para DevNetOps, segurança de redes e gerenciamento de infraestrutura com IA.</p>
+          <ul>
+            <li>Modelo de Negócio: Licenciamento por aluno (mensal/anual) ou por laboratório/instituição.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Consultoria para Modernização</h3>
+          <p>Realizamos o projeto e a implementação de infraestrutura de virtualização (on-premise ou em nuvem) para instituições que desejam hospedar seus próprios ambientes.</p>
+        </div>
+        <div class="card">
+          <h3>Workshops e Mentoria</h3>
+          <p>Cursos intensivos e mentoria sobre tópicos como IaC, CI/CD para redes e aplicações de IA em monitoramento e segurança.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="container">
+      <h2>Suporte e Conformidade</h2>
+      <p>Garantimos a qualidade, segurança e disponibilidade de nossos serviços com um plano de suporte robusto e aderência às principais normas.</p>
+      <a href="suporte-conformidade.html" class="btn">Veja nosso SLA e Normas</a>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-socials">
+      <a href="http://linkedin.com/company/evonetai" target="_blank" title="LinkedIn">LinkedIn</a>
+      <a href="http://youtube.com/@EvoNetAI" target="_blank" title="YouTube">YouTube</a>
+    </div>
+    <p>&copy; 2025 EvoNet AI. Todos os direitos reservados.</p>
+  </footer>
+
+  <!-- Particles.js config -->
+  <script>
+    particlesJS("particles-js", {
+      "particles": {
+        "number": { "value": 60 },
+        "color": { "value": "#00d4ff" },
+        "shape": { "type": "circle" },
+        "opacity": { "value": 0.5 },
+        "size": { "value": 3 },
+        "line_linked": { "enable": true, "distance": 150, "color": "#00d4ff", "opacity": 0.4, "width": 1 },
+        "move": { "enable": true, "speed": 2 }
+      },
+      "interactivity": {
+        "detect_on": "canvas",
+        "events": {
+          "onhover": { "enable": true, "mode": "grab" },
+          "onclick": { "enable": true, "mode": "push" }
+        },
+        "modes": {
+          "grab": { "distance": 140, "line_linked": { "opacity": 0.7 } },
+          "push": { "particles_nb": 4 }
+        }
+      },
+      "retina_detect": true
+    });
+  </script>
+
+  <!-- Script do menu -->
+  <script>
+    function toggleMenu() {
+      document.querySelector(".nav-menu").classList.toggle("active");
+    }
+  </script>
+
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>

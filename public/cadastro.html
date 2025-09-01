@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cadastro | EvoNet AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* Reset e base */
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
+body, html { height:100%; overflow-x:hidden; }
+
+/* Fundo animado com gradiente */
+body {
+  background: linear-gradient(-45deg, #0a0a0f, #1a1a2e, #0f3057, #2a2a72);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+/* Header e navbar */
+.header {
+  width:100%;
+  background: rgba(17,24,39,0.9);
+  backdrop-filter: blur(10px);
+  padding:15px 50px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  position:fixed;
+  top:0;
+  left:0;
+  z-index:1000;
+}
+
+.navbar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.nav-logo {
+  font-size:1.8rem;
+  color:#4cc9f0;
+  font-weight:700;
+  text-decoration:none;
+}
+.nav-logo span { color:#38a3c9; }
+
+.nav-menu {
+  list-style:none;
+  display:flex;
+  gap:20px;
+}
+.nav-item {}
+.nav-link {
+  color:#fff;
+  text-decoration:none;
+  font-weight:500;
+  transition:0.3s;
+}
+.nav-link:hover { color:#4cc9f0; }
+
+/* Container central */
+.container {
+  margin-top:100px; /* espaço para header fixo */
+  background: rgba(17,24,39,0.9);
+  backdrop-filter: blur(10px);
+  padding:50px 40px;
+  border-radius:20px;
+  width:380px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+
+/* Partículas sutis */
+.container::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; width:100%; height:100%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+  background-size:20px 20px;
+  pointer-events:none;
+  animation: moveParticles 10s linear infinite;
+}
+
+/* Título */
+h2 {
+  margin-bottom:30px;
+  font-size:2rem;
+  color:#4cc9f0;
+  text-shadow: 0 0 10px #4cc9f0;
+  letter-spacing:1px;
+}
+
+/* Inputs estilizados */
+input {
+  width:100%;
+  padding:14px 12px;
+  margin:12px 0;
+  border:none;
+  border-radius:12px;
+  outline:none;
+  font-size:1rem;
+  background: rgba(255,255,255,0.05);
+  color:#fff;
+  transition: all 0.3s ease;
+}
+input:focus {
+  background: rgba(76,201,240,0.1);
+  box-shadow: 0 0 10px #4cc9f0;
+}
+
+/* Botão */
+button {
+  width:100%;
+  padding:14px;
+  margin-top:20px;
+  background: linear-gradient(45deg,#4cc9f0,#38a3c9);
+  border:none;
+  border-radius:12px;
+  color:#0a0a0f;
+  font-weight:700;
+  font-size:1rem;
+  cursor:pointer;
+  transition: all 0.4s ease;
+  position:relative;
+  overflow:hidden;
+}
+button::after {
+  content:'';
+  position:absolute;
+  width:300%;
+  height:300%;
+  background: rgba(255,255,255,0.2);
+  top: -100%; left:-100%;
+  transform: rotate(45deg);
+  transition: all 0.5s ease;
+}
+button:hover::after {
+  top:0;
+  left:0;
+}
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px #4cc9f0;
+}
+
+/* Link */
+.link { margin-top:20px; font-size:0.9rem; }
+.link a { color:#4cc9f0; text-decoration:none; transition:0.3s; }
+.link a:hover { text-decoration:underline; color:#38a3c9; }
+
+/* Feedback mensagem */
+.feedback {
+  margin-top:10px;
+  font-size:0.9rem;
+  padding:10px;
+  border-radius:8px;
+  display:none;
+}
+
+/* Animações */
+@keyframes gradientBG {
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+@keyframes moveParticles {
+  0% {background-position:0 0;}
+  100% {background-position:100% 100%;}
+}
+
+/* Responsividade */
+@media(max-width:768px){
+  .navbar { flex-direction:column; gap:10px; }
+  .container{ width:90%; padding:40px 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<body>
+  
+    <!-- Navbar -->
+  <header class="header">
+    <nav class="navbar">
+      <a href="home.html" class="nav-logo">EvoNet<span>AI</span></a>
+      <ul class="nav-menu">
+        <li><a href="home.html" class="nav-link">Home</a></li>
+        <li><a href="cadastro.html" class="nav-link">Cadastrar</a></li>
+        <li><a href="login.html" class="nav-link">Entrar</a></li>
+        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+        <li><a href="dominio.html" class="nav-link">Domínio</a></li>
+        <li><a href="mvp.html" class="nav-link">MVP</a></li>
+        <li><a href="plataforma.html" class="nav-link">Plataforma</a></li>
+        <li><a href="projeto-de-rede.html" class="nav-link">Projeto de Rede</a></li>
+        <li><a href="servicos.html" class="nav-link">Serviços</a></li>
+        <li><a href="suporte-conformidade.html" class="nav-link">Suporte</a></li>
+        <li><a href="tecnologia.html" class="nav-link">Tecnologia</a></li>
+      </ul>
+      <div class="hamburger" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+    </nav>
+  </header>
+
+  
+
+<body>
+    <div id="header-placeholder"></div>
+
+    <div id="footer-placeholder"></div>
+
+    </body>
+
+<!-- FORMULÁRIO -->
+<div class="container">
+  <h2>Criar Conta</h2>
+  <form onsubmit="registerUser(event)">
+    <input type="text" id="name" placeholder="Nome completo" required>
+    <input type="email" id="email" placeholder="E-mail" required>
+    <input type="password" id="password" placeholder="Senha" required>
+    <input type="password" id="confirmPassword" placeholder="Confirmar Senha" required>
+    <button type="submit">Cadastrar</button>
+  </form>
+  <div class="feedback" id="feedback"></div>
+  <div class="link">
+    <p>Já tem conta? <a href="login.html">Login</a></p>
+  </div>
+</div>
+
+<script>
+function registerUser(event){
+  event.preventDefault();
+  const pass = document.getElementById("password").value;
+  const confirm = document.getElementById("confirmPassword").value;
+  const feedback = document.getElementById("feedback");
+  
+  if(pass !== confirm){
+    feedback.style.display = "block";
+    feedback.style.background = "rgba(255,0,0,0.2)";
+    feedback.style.color = "#ff4c4c";
+    feedback.textContent = "As senhas não coincidem!";
+    return;
+  }
+
+  feedback.style.display = "block";
+  feedback.style.background = "rgba(76,201,240,0.2)";
+  feedback.style.color = "#4cc9f0";
+  feedback.textContent = "Cadastro realizado com sucesso!";
+  
+  setTimeout(()=>{ window.location.href = "login.html"; },1500);
+}
+</script>
+
+</body>
+</html>

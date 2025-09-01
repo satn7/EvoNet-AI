@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login & Cadastro | EvoNet AI</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+<style>
+/* ===== BODY ===== */
+body {
+  margin:0; padding:0; font-family:'Segoe UI', sans-serif;
+  background:#0f2027; color:#fff; height:100vh; overflow:hidden;
+}
+#particles-js { position:absolute; width:100%; height:100%; z-index:0; }
+
+/* ===== LOGIN/REGISTER CONTAINERS ===== */
+.login-container-animated {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  background:rgba(0,0,0,0.7); padding:40px; border-radius:15px; width:350px;
+  backdrop-filter:blur(10px); box-shadow:0 0 30px rgba(0,255,200,0.5); z-index:1;
+  text-align:center; transition:0.5s;
+}
+.login-container-animated h1 span { color:#50e3c2; }
+
+/* ===== INPUTS ===== */
+.input-group-animated { position:relative; margin-bottom:25px; }
+.input-group-animated input,
+.input-group-animated select {
+  width:100%; padding:12px 40px 12px 12px; border:none; border-radius:8px;
+  background:rgba(255,255,255,0.05); color:#fff; outline:none; font-size:1rem;
+}
+.input-group-animated label {
+  position:absolute; top:50%; left:12px; color:#aaa;
+  transform:translateY(-50%); pointer-events:none; transition:0.3s;
+}
+.input-group-animated input:focus + label,
+.input-group-animated input:not(:placeholder-shown) + label,
+.input-group-animated select:focus + label,
+.input-group-animated select:not([value=""]) + label {
+  top:-10px; font-size:0.8rem; color:#50e3c2;
+}
+.input-group-animated i {
+  position:absolute; right:12px; top:50%; transform:translateY(-50%); color:#50e3c2;
+}
+
+/* ===== BUTTONS ===== */
+.login-btn-animated {
+  position:relative; display:inline-block; padding:12px 25px; border:none; border-radius:10px;
+  background:linear-gradient(45deg,#4a90e2,#50e3c2,#74d0e5); color:#fff; font-weight:600;
+  cursor:pointer; overflow:hidden; width:100%;
+}
+.login-btn-animated:hover { transform:scale(1.05); }
+
+/* Spinner */
+.login-btn-animated .spinner {
+  position:absolute; right:15px; top:50%; transform:translateY(-50%); width:20px; height:20px;
+  border:3px solid #fff; border-top:3px solid #50e3c2; border-radius:50%; animation:spin 1s linear infinite; display:none;
+}
+@keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+
+/* ===== MESSAGES ===== */
+.message { margin-top:10px; font-size:0.9rem; height:20px; color:#f55; }
+
+/* ===== LINK SWITCH ===== */
+.link-switch { margin-top:15px; font-size:0.9rem; }
+.link-switch a { color:#50e3c2; text-decoration:none; transition:0.3s; }
+.link-switch a:hover { text-decoration:underline; }
+
+/* ===== ANIMATIONS ===== */
+.login-body-animated { animation:fadeIn 1s ease forwards; }
+@keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+</style>
+</head>
+<body class="login-body-animated">
+
+<!-- PARTICLES -->
+<div id="particles-js"></div>
+
+<!-- LOGIN -->
+<div class="login-container-animated" id="login-container">
+  <h1>Acessar <span>Plataforma</span></h1>
+  <form id="loginForm">
+    <div class="input-group-animated">
+      <input type="email" id="email" placeholder=" " required>
+      <label for="email">E-mail</label>
+      <i class="fas fa-envelope"></i>
+    </div>
+    <div class="input-group-animated">
+      <input type="password" id="password" placeholder=" " required>
+      <label for="password">Senha</label>
+      <i class="fas fa-lock"></i>
+    </div>
+    <button type="submit" class="login-btn-animated">
+      <span class="btn-text">ENTRAR</span>
+      <span class="spinner"></span>
+    </button>
+  </form>
+  <div class="message" id="loginMessage"></div>
+  <p class="link-switch">Não tem uma conta? <a href="#" id="show-register">Cadastre-se</a></p>
+</div>
+
+<!-- REGISTRO -->
+<div class="login-container-animated" id="register-container" style="display:none;">
+  <h1>Criar <span>Conta</span></h1>
+  <form id="registerForm">
+    <div class="input-group-animated">
+      <input type="text" id="reg-name" placeholder=" " required>
+      <label for="reg-name">Nome Completo</label>
+      <i class="fas fa-user"></i>
+    </div>
+    <div class="input-group-animated">
+      <input type="email" id="reg-email" placeholder=" " required>
+      <label for="reg-email">E-mail</label>
+      <i class="fas fa-envelope"></i>
+    </div>
+    <div class="input-group-animated">
+      <input type="password" id="reg-password" placeholder=" " required>
+      <label for="reg-password">Senha (mínimo 8 caracteres)</label>
+      <i class="fas fa-lock"></i>
+    </div>
+    <div class="input-group-animated">
+      <select id="reg-role" required>
+        <option value="" disabled selected>Selecione seu perfil...</option>
+        <option value="student">Aluno</option>
+        <option value="teacher">Professor</option>
+      </select>
+      <i class="fas fa-user-shield"></i>
+    </div>
+    <button type="submit" class="login-btn-animated">
+      <span class="btn-text">CADASTRAR</span>
+      <span class="spinner"></span>
+    </button>
+  </form>
+  <div class="message" id="registerMessage"></div>
+  <p class="link-switch">Já tem uma conta? <a href="#" id="show-login">Faça Login</a></p>
+</div>
+
+<!-- PARTICLES.JS -->
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script>
+// PARTICLES CONFIG
+particlesJS("particles-js", {
+  "particles": {
+    "number": {"value": 80, "density": {"enable": true, "value_area": 800}},
+    "color": {"value": "#50e3c2"},
+    "shape": {"type": "circle"},
+    "opacity": {"value":0.5, "random":true},
+    "size":{"value":3,"random":true},
+    "line_linked":{"enable":true,"distance":150,"color":"#50e3c2","opacity":0.4,"width":1},
+    "move":{"enable":true,"speed":2}
+  },
+  "interactivity": {
+    "events":{"onhover":{"enable":true,"mode":"grab"},"onclick":{"enable":true,"mode":"push"}}
+  }
+});
+
+// SWITCH LOGIN/REGISTER
+const loginContainer = document.getElementById("login-container");
+const registerContainer = document.getElementById("register-container");
+document.getElementById("show-register").addEventListener("click", e => {
+  e.preventDefault(); loginContainer.style.display="none"; registerContainer.style.display="block";
+});
+document.getElementById("show-login").addEventListener("click", e => {
+  e.preventDefault(); loginContainer.style.display="block"; registerContainer.style.display="none";
+});
+
+// LOGIN FORM
+const loginForm = document.getElementById("loginForm");
+const loginMessage = document.getElementById("loginMessage");
+loginForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  loginMessage.style.color="#fff"; loginMessage.textContent="Entrando...";
+  const spinner = loginForm.querySelector(".spinner"); spinner.style.display="inline-block";
+
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  try {
+    // EXEMPLO: Simulação de login
+    await new Promise(r=>setTimeout(r,1000));
+    spinner.style.display="none";
+    if(email==="aluno@exemplo.com" && password==="12345678"){
+      loginMessage.style.color="#50e3c2"; loginMessage.textContent="Login bem-sucedido!";
+      localStorage.setItem("token","fake-jwt-token");
+      setTimeout(()=>alert("Redirecionar para dashboard..."),1000);
+    } else {
+      loginMessage.style.color="#f55"; loginMessage.textContent="Email ou senha inválidos";
+    }
+  } catch(err){ spinner.style.display="none"; loginMessage.style.color="#f55"; loginMessage.textContent="Erro de conexão";}
+});
+
+// REGISTER FORM
+const registerForm = document.getElementById("registerForm");
+const registerMessage = document.getElementById("registerMessage");
+registerForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  registerMessage.style.color="#fff"; registerMessage.textContent="Cadastrando...";
+  const spinner = registerForm.querySelector(".spinner"); spinner.style.display="inline-block";
+
+  const name = document.getElementById("reg-name").value;
+  const email = document.getElementById("reg-email").value;
+  const password = document.getElementById("reg-password").value;
+  const role = document.getElementById("reg-role").value;
+
+  if(password.length<8){ spinner.style.display="none"; registerMessage.style.color="#f55"; registerMessage.textContent="Senha muito curta"; return; }
+
+  try{
+    // EXEMPLO: Simulação de cadastro
+    await new Promise(r=>setTimeout(r,1000));
+    spinner.style.display="none";
+    registerMessage.style.color="#50e3c2"; registerMessage.textContent="Cadastro realizado com sucesso!";
+    setTimeout(()=>{ registerContainer.style.display="none"; loginContainer.style.display="block"; },1000);
+  }catch(err){ spinner.style.display="none"; registerMessage.style.color="#f55"; registerMessage.textContent="Erro de conexão";}
+});
+</script>
+</body>
+</html>
